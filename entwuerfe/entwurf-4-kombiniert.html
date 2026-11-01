@@ -27,7 +27,7 @@
   --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "Segoe UI", Roboto, Arial, sans-serif;
   --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", "Segoe UI", Roboto, Arial, sans-serif;
   --bar-h: 56px;
-  --days-h: 52px;
+  --days-h: 48px;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --bg: #000000; --surface: #161618; --fg: #F5F5F7; --fg2: #9C9CA3; --fg3: #5C5C63; --line: rgba(255,255,255,.09); --line-strong: rgba(255,255,255,.26); --heart: #FF4D5E; --glass: rgba(0,0,0,.72); --scrim: rgba(0,0,0,.66); color-scheme: dark;
@@ -131,14 +131,15 @@ img { max-width: 100%; display: block; }
 
 /* ---------- Tagesleiste ---------- */
 .days { position: sticky; top: calc(env(safe-area-inset-top, 0px) + var(--bar-h)); z-index: 15; background: var(--glass); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid var(--line); margin-top: 30px; }
-.days-strip, .later-strip { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; align-items: center; }
-.days-strip { height: var(--days-h); }
-.days-strip::-webkit-scrollbar, .later-strip::-webkit-scrollbar { display: none; }
+.days-strip { display: flex; gap: 5px; overflow-x: auto; scrollbar-width: none; align-items: center; height: var(--days-h); }
+.days-strip::-webkit-scrollbar { display: none; }
 .dbtn, .pbtn, .today-btn { appearance: none; border: 1px solid var(--line); background: none; flex: none; border-radius: 8px; cursor: pointer; color: var(--fg); }
-.dbtn { width: 46px; height: 42px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; }
+.dbtn { width: 40px; height: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; }
 .later { display: flex; align-items: center; gap: 8px; padding-bottom: 7px; }
 .later > span { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--fg2); flex: none; }
-.later-strip { flex: 1; min-width: 0; }
+#todayBtn { margin-left: auto; }
+.dbtn.today { border-color: var(--fg); }
+.picker { display: flex; flex-wrap: wrap; gap: 6px; padding-bottom: 8px; }
 .pbtn, .today-btn { height: 28px; padding: 0 10px; font-size: 12.5px; font-weight: 600; white-space: nowrap; }
 .today-btn { background: var(--surface); border-color: transparent; }
 .dbtn small { font-size: 9.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--fg2); }
@@ -256,7 +257,8 @@ footer a { color: var(--fg); }
   <nav class="days" aria-label="Zu einem Zeitraum springen">
     <div class="wrap">
       <div class="days-strip" id="days"></div>
-      <div class="later"><span>Später</span><div class="later-strip" id="later"></div><button class="today-btn" id="todayBtn">↑ Heute</button></div>
+      <div class="later"><span>Später</span><button class="pbtn" id="monthBtn" data-pick="monat" aria-expanded="false" aria-controls="picker"></button><button class="pbtn" id="yearBtn" data-pick="jahr" aria-expanded="false" aria-controls="picker"></button><button class="today-btn" id="todayBtn">↑ Heute</button></div>
+      <div class="picker" id="picker" hidden></div>
     </div>
   </nav>
 
@@ -340,7 +342,9 @@ footer a { color: var(--fg); }
     ['b07', 222, '20:00', '23:00', 'musik', 'einmalig', 'Einmaliges Konzert', 'Open-Air auf dem Dach der Markthalle', 'Markthalle', 'Zentrum', '25 €', 'Ein Abend mit Blick über die Stadt: Streichorchester und Elektronik, nur 300 Plätze.'],
     ['b08', 318, '10:00', '18:00', 'kultur', 'selten', 'Alle 10 Jahre', 'Tag der offenen Stollen', 'Stollensystem am Schloßberg', 'Schloßchemnitz', 'Kostenlos', 'Die historischen Gänge unter dem Schloßberg sind nur alle zehn Jahre für die Öffentlichkeit zugänglich.'],
     ['b09', 455, '14:00', '22:00', 'familie', 'einmalig', 'Einmaliges Jubiläum', 'Stadtfest: 25 Jahre Brückenstraße', 'Brückenstraße', 'Zentrum', 'Kostenlos', 'Ein Tag mit Bühnen, Ständen und Lichtern entlang der ganzen Straße.'],
-    ['b10', 640, '18:30', '21:00', 'sport', 'selten', 'Alle 4 Jahre', 'Sternlauf der Partnerstädte', 'Start an fünf Stadtteilplätzen', 'Ganz Chemnitz', 'Kostenlos', 'Läufer aus allen Stadtteilen treffen sich am Markt, begleitet von Trommelgruppen.']
+    ['b10', 640, '18:30', '21:00', 'sport', 'selten', 'Alle 4 Jahre', 'Sternlauf der Partnerstädte', 'Start an fünf Stadtteilplätzen', 'Ganz Chemnitz', 'Kostenlos', 'Läufer aus allen Stadtteilen treffen sich am Markt, begleitet von Trommelgruppen.'],
+    ['b11', 820, '19:00', '23:00', 'kultur', 'einmalig', 'Einmalige Veranstaltung', 'Lichtfestival: 900 Jahre Stadtgeschichte', 'Innenstadt', 'Zentrum', 'Kostenlos', 'Zwölf Lichtinstallationen erzählen an zwölf Orten der Innenstadt aus 900 Jahren Chemnitz.'],
+    ['b12', 1010, '11:00', '17:00', 'fuehrung', 'selten', 'Alle 25 Jahre', 'Öffnung der Zeitkapsel im Rathaus', 'Neues Rathaus', 'Zentrum', 'Kostenlos', 'Die vor 25 Jahren eingemauerte Zeitkapsel wird geöffnet, die Fundstücke werden den ganzen Tag gezeigt.']
   ];
 
   // Vorlagen für weitere erfundene Termine an allen späteren Tagen (je Tag 1–5 davon, siehe unten):
@@ -403,7 +407,7 @@ footer a { color: var(--fg); }
   const TODAY = new Date(); TODAY.setHours(0, 0, 0, 0);
   const dayDate = n => { const d = new Date(TODAY); d.setDate(d.getDate() + n); return d; };
   const offset = d => Math.round((d - TODAY) / 864e5);   // Tage ab heute
-  const H = offset(new Date(TODAY.getFullYear() + 2, TODAY.getMonth(), TODAY.getDate()));   // höchstens zwei Jahre voraus
+  const H = offset(new Date(TODAY.getFullYear() + 3, TODAY.getMonth(), TODAY.getDate()));   // höchstens drei Jahre voraus
 
   const EVENTS = [];
   SPECIAL.forEach(a => EVENTS.push({ id: a[0], day: a[1], time: a[2], end: a[3], cat: a[4], rhythm: a[5], rhythmText: a[6], title: a[7], place: a[8], district: a[9], price: a[10], desc: a[11], url: LINK + a[0], cover: a[0], date: dayDate(a[1]), ...MEDIA[a[0]] }));
@@ -455,7 +459,7 @@ footer a { color: var(--fg); }
   const topInterests = () => Object.entries(interest).filter(([, v]) => v >= 2).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([id]) => catName(id));
 
   // Sortierung: Seltenheit zuerst, dann Interesse, dann Nähe
-  const score = e => WEIGHT[e.rhythm] + affinity(e.cat) * 70 - e.day / 4;
+  const score = e => WEIGHT[e.rhythm] + affinity(e.cat) * 70 - e.day / 12;
   const rank = list => list.slice().sort((a, b) => score(b) - score(a) || a.day - b.day || a.time.localeCompare(b.time));
   const shown = e => active.has(e.cat);
 
@@ -643,34 +647,52 @@ footer a { color: var(--fg); }
     if (w) w.src = on ? w.dataset.webp : cover(w.dataset.cover);
   }), { threshold: .9 });
 
-  // Zeiträume der Leiste „Später“, alle aus dem heutigen Datum berechnet: Rest des Monats,
-  // die nächsten drei Monate einzeln, Rest des Jahres, nächstes und übernächstes Jahr (bis höchstens zwei Jahre voraus)
-  const PERIODS = (() => {
-    const y = TODAY.getFullYear(), m = TODAY.getMonth(), list = [];
-    const at = (yy, mm) => offset(new Date(yy, mm, 1));
-    const add = (label, aria, from, to) => { from = Math.max(from, 7); to = Math.min(to, H); if (from < to) list.push({ label, aria, from, to }); };
-    add(`Rest ${MO[m].slice(0, 3)}`, `Rest ${MO[m]}`, 7, at(y, m + 1));
-    for (let i = 1; i <= 3; i++) { const d = new Date(y, m + i, 1); add(MO[d.getMonth()].slice(0, 3), `${MO[d.getMonth()]} ${d.getFullYear()}`, at(y, m + i), at(y, m + i + 1)); }
-    const after = at(y, m + 4);
-    add(`Rest ${y}`, `Rest ${y}`, after, at(y + 1, 0));
-    add(String(y + 1), String(y + 1), Math.max(after, at(y + 1, 0)), at(y + 2, 0));
-    add(String(y + 2), String(y + 2), Math.max(after, at(y + 2, 0)), H);
-    return list;
-  })();
+  // Tagesleiste wie ein Kalender: obere Zeile alle Tage eines Monats, untere Zeile Monat und Jahr wählen.
+  // Alles aus dem Gerätedatum berechnet. Monate werden ab Januar des laufenden Jahres gezählt (12 = Januar im nächsten Jahr).
+  const Y0 = TODAY.getFullYear(), M0 = TODAY.getMonth();
+  const monthOf = n => { const d = dayDate(n); return (d.getFullYear() - Y0) * 12 + d.getMonth(); };
+  const monthRange = m => [offset(new Date(Y0, m, 1)), offset(new Date(Y0, m + 1, 1))];
+  const startMonth = monthOf(1) > M0 ? M0 + 1 : M0;   // am letzten Tag des Monats zeigt die Leiste schon den nächsten
+  const lastMonth = monthOf(H - 1);
+  let barMonth = startMonth, cnt = [], special = [];
+  const has = ([a, b]) => cnt.slice(Math.max(a, 0), b).some(Boolean);
 
-  function renderDays() {
-    const cnt = new Array(H).fill(0), special = [];
+  function countDays() {   // Termine je Tag in den gewählten Kategorien
+    cnt = new Array(H).fill(0); special = [];
     items.forEach(e => { cnt[e.day]++; if (e.rhythm !== 'regelmaessig') special[e.day] = true; });
-    const any = (a, b) => cnt.slice(a, b).some(Boolean);
+  }
+  function renderDays() {
+    const [a, b] = monthRange(barMonth), md = new Date(Y0, barMonth, 1);
     let html = '';
-    for (let n = 0; n < 7; n++) {
+    for (let n = a; n < b; n++) {   // vergangene Tage und Tage ohne Termine sind ausgegraut
       const d = dayDate(n);
-      html += `<button class="dbtn" data-from="${n}" data-to="${n + 1}" ${cnt[n] ? '' : 'disabled'} aria-label="${relDay(n)}, ${d.getDate()}. ${MO[d.getMonth()]}">
-        <small>${n === 0 ? 'Heute' : n === 1 ? 'Morgen' : WD[d.getDay()].slice(0, 2)}</small><b>${d.getDate()}</b>${special[n] ? '<span class="dot" title="Besonderes an diesem Tag"></span>' : ''}</button>`;
+      html += `<button class="dbtn${n === 0 ? ' today' : ''}" data-from="${n}" data-to="${n + 1}" ${n >= 0 && cnt[n] ? '' : 'disabled'} aria-label="${fmtLong(d)}">
+        <small>${n === 0 ? 'Heute' : WD[d.getDay()].slice(0, 2)}</small><b>${d.getDate()}</b>${special[n] ? '<span class="dot" title="Besonderes an diesem Tag"></span>' : ''}</button>`;
     }
     document.getElementById('days').innerHTML = html;
-    document.getElementById('later').innerHTML = PERIODS.map(p => `<button class="pbtn" data-from="${p.from}" data-to="${p.to}" ${any(p.from, p.to) ? '' : 'disabled'} aria-label="${p.aria}">${p.label}</button>`).join('');
-    spy(true);
+    document.getElementById('monthBtn').textContent = `${MO[md.getMonth()]} ▾`;
+    document.getElementById('yearBtn').textContent = `${md.getFullYear()} ▾`;
+    current = -1;
+  }
+  function openPicker(kind) {   // Auswahl der Monate (des angezeigten Jahres) oder der Jahre, höchstens drei Jahre voraus
+    const picker = document.getElementById('picker'), y = Math.floor(barMonth / 12);
+    const months = kind === 'monat' ? [...Array(12)].map((_, i) => y * 12 + i) : [0, 1, 2, 3].map(k => {
+      for (let m = Math.max(k * 12, M0); m < k * 12 + 12 && m <= lastMonth; m++) if (has(monthRange(m))) return m;   // erster Monat mit Terminen
+      return -1;
+    });
+    picker.innerHTML = months.map((m, i) => {
+      const ok = m >= M0 && m <= lastMonth && has(monthRange(m));
+      const label = kind === 'monat' ? MO[i].slice(0, 3) : Y0 + i;
+      const sel = kind === 'monat' ? m === barMonth : i === y;
+      return `<button class="pbtn" data-month="${m}" ${ok ? '' : 'disabled'} aria-current="${sel}">${label}</button>`;
+    }).join('');
+    picker.hidden = false;
+    picker.dataset.kind = kind;
+    document.querySelectorAll('[data-pick]').forEach(b => b.setAttribute('aria-expanded', b.dataset.pick === kind));
+  }
+  function closePicker() {
+    document.getElementById('picker').hidden = true;
+    document.querySelectorAll('[data-pick]').forEach(b => b.setAttribute('aria-expanded', false));
   }
 
   // Liste: zuerst höchstens 200 Termine Tag für Tag, dann mit „Weitere … anzeigen“ jeweils 50 mehr.
@@ -719,7 +741,7 @@ footer a { color: var(--fg); }
   function renderAll() {
     items = EVENTS.filter(shown);   // schon nach Datum sortiert
     listStart = 0; listLimit = 200;
-    renderFilters(); renderHero(); renderDays(); renderList(); renderRegular(); renderFavBtn();
+    countDays(); renderFilters(); renderHero(); renderDays(); renderList(); renderRegular(); renderFavBtn(); spy(true);
     document.querySelectorAll('#heroRail, #regRail').forEach(el => lazy.observe(el));
   }
 
@@ -756,8 +778,12 @@ footer a { color: var(--fg); }
     const s = e.target.closest('[data-scroll]');
     if (s) { const r = document.getElementById(s.dataset.scroll); pause(r, 3000); r.scrollBy({ left: s.dataset.dir * r.clientWidth * .8, behavior: 'smooth' }); return; }
     if (e.target.id === 'resetLearn') { interest = {}; keep(); toast.hidden = true; renderAll(); return; }
-    const day = e.target.closest('.dbtn, .pbtn');
+    const day = e.target.closest('.dbtn');
     if (day) { jumpTo(+day.dataset.from, +day.dataset.to); return; }
+    const pick = e.target.closest('[data-pick]');
+    if (pick) { const p = document.getElementById('picker'); p.hidden || p.dataset.kind !== pick.dataset.pick ? openPicker(pick.dataset.pick) : closePicker(); return; }
+    const m = e.target.closest('[data-month]');
+    if (m) { closePicker(); barMonth = +m.dataset.month; renderDays(); jumpTo(...monthRange(barMonth)); return; }
     if (e.target.closest('[data-more]')) { listLimit += 50; renderList(); return; }
     const item = e.target.closest('[data-id]');
     if (item) openDetail(byId(item.dataset.id));
@@ -784,15 +810,20 @@ footer a { color: var(--fg); }
     markDay(n);
   }
   document.getElementById('todayBtn').addEventListener('click', () => {
+    closePicker();
     if (listStart) { listStart = 0; listLimit = 200; renderList(); }
+    barMonth = startMonth; renderDays();
     window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
   });
   let current = -1;
-  function markDay(n) {
+  function markDay(n) {   // die Leiste wandert mit: gezeigter Monat folgt der Liste, sichtbarer Tag ist markiert
     if (n === current) return;
+    const m = n === 0 ? startMonth : monthOf(n);
+    if (m !== barMonth) { barMonth = m; renderDays(); }
     current = n;
-    document.querySelectorAll('.dbtn, .pbtn').forEach(b => {
-      const on = n >= +b.dataset.from && n < +b.dataset.to, strip = b.parentElement;
+    const strip = document.getElementById('days');
+    strip.querySelectorAll('.dbtn').forEach(b => {
+      const on = +b.dataset.from === n;
       b.setAttribute('aria-current', on);
       if (on) strip.scrollTo({ left: b.offsetLeft - strip.offsetLeft - strip.clientWidth / 2 + b.offsetWidth / 2, behavior: reduced ? 'auto' : 'smooth' });
     });
