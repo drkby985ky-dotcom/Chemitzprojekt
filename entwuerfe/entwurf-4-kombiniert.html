@@ -27,7 +27,7 @@
   --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "Segoe UI", Roboto, Arial, sans-serif;
   --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", "Segoe UI", Roboto, Arial, sans-serif;
   --bar-h: 56px;
-  --days-h: 78px;
+  --days-h: 62px;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --bg: #000000; --surface: #161618; --fg: #F5F5F7; --fg2: #9C9CA3; --fg3: #5C5C63; --line: rgba(255,255,255,.09); --line-strong: rgba(255,255,255,.26); --heart: #FF4D5E; --glass: rgba(0,0,0,.72); --scrim: rgba(0,0,0,.66); color-scheme: dark;
@@ -52,8 +52,8 @@ img { max-width: 100%; display: block; }
 .bar-in { height: var(--bar-h); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .brand { font-family: var(--font-display); font-weight: 800; font-size: 19px; letter-spacing: -.02em; color: var(--fg); text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .brand span { color: var(--fg2); font-weight: 600; }
-.fav-btn { appearance: none; border: 0; background: var(--fg); color: var(--bg); height: 40px; padding: 0 14px 0 12px; border-radius: 10px; display: inline-flex; align-items: center; gap: 7px; font-weight: 650; font-size: 14.5px; cursor: pointer; flex: none; }
-.fav-btn .ico { width: 19px; height: 19px; }
+.fav-btn { appearance: none; border: 0; background: var(--fg); color: var(--bg); height: 30px; padding: 0 10px 0 8px; border-radius: 8px; display: inline-flex; align-items: center; gap: 5px; font-weight: 650; font-size: 12.5px; cursor: pointer; flex: none; }
+.fav-btn .ico { width: 15px; height: 15px; }
 .fav-btn .n { font-variant-numeric: tabular-nums; opacity: .7; }
 .fav-btn.bump { animation: bump .35s ease; }
 @keyframes bump { 50% { transform: scale(1.08); } }
@@ -61,78 +61,74 @@ img { max-width: 100%; display: block; }
 /* ---------- Einleitung + Filter ---------- */
 .intro { padding-block: 14px 0; }
 .today { font-size: 12.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--fg2); margin: 0; }
-h1 { font-family: var(--font-display); font-size: clamp(30px, 8.4vw, 44px); line-height: 1.04; letter-spacing: -.03em; margin: 4px 0 0; font-weight: 800; text-wrap: balance; }
-.filters { display: flex; gap: 2px 20px; overflow-x: auto; scrollbar-width: none; margin: 14px calc(-1 * max(16px, env(safe-area-inset-left, 0px))) 0; padding: 0 max(16px, env(safe-area-inset-left, 0px)); border-bottom: 1px solid var(--line); }
+.filters { display: flex; gap: 2px 20px; overflow-x: auto; scrollbar-width: none; margin: 6px calc(-1 * max(16px, env(safe-area-inset-left, 0px))) 0; padding: 0 max(16px, env(safe-area-inset-left, 0px)); border-bottom: 1px solid var(--line); }
 .filters::-webkit-scrollbar { display: none; }
 .flt { appearance: none; border: 0; background: none; padding: 12px 0 11px; min-height: 44px; font-size: 15.5px; font-weight: 600; color: var(--fg3); white-space: nowrap; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; flex: none; }
 .flt[aria-pressed="true"] { color: var(--fg); border-bottom-color: var(--fg); }
 .flt.all { padding-right: 16px; border-right: 1px solid var(--line); border-bottom-color: transparent; }
 .flt.all[aria-pressed="true"] { color: var(--fg); }
-.learn { display: flex; gap: 8px; align-items: center; font-size: 13px; color: var(--fg2); margin: 12px 0 0; min-height: 20px; }
-.learn .ico { width: 16px; height: 16px; }
-.learn > span { flex: 1; min-width: 0; }
-.learn button { appearance: none; border: 0; background: none; padding: 6px 0; color: var(--fg); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; flex: none; font-size: 13px; }
+.toast { position: fixed; z-index: 40; left: 50%; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); width: max-content; max-width: calc(100% - 32px); display: flex; gap: 10px; align-items: center; background: var(--fg); color: var(--bg); font-size: 13.5px; line-height: 1.35; padding: 10px 14px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,.22); animation: fade .25s ease; }
+.toast .ico { width: 16px; height: 16px; }
+.toast button { appearance: none; border: 0; background: none; padding: 6px 0; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; flex: none; font-size: 13px; }
 
 /* ---------- Abschnittsköpfe ---------- */
 .sec { margin-top: 26px; }
 .sec-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
 .sec-head h2 { font-family: var(--font-display); font-size: 24px; letter-spacing: -.02em; line-height: 1.1; margin: 0; }
 .sec-head p { margin: 3px 0 0; color: var(--fg2); font-size: 14px; }
-.sec-tools { display: flex; align-items: center; gap: 8px; flex: none; }
-.seg { display: inline-flex; border: 1px solid var(--line-strong); border-radius: 8px; overflow: hidden; }
-.seg button { appearance: none; border: 0; background: none; padding: 0 12px; height: 34px; font-size: 13.5px; font-weight: 600; color: var(--fg2); cursor: pointer; }
-.seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
 .arrows { display: none; gap: 6px; }
 @media (hover: hover) and (min-width: 760px) { .arrows { display: flex; } }
 .arrow { appearance: none; border: 1px solid var(--line-strong); background: none; width: 34px; height: 34px; border-radius: 8px; display: grid; place-items: center; cursor: pointer; color: var(--fg); }
 .arrow .ico { width: 18px; height: 18px; }
-.counter { font-size: 13px; color: var(--fg2); font-variant-numeric: tabular-nums; min-width: 42px; text-align: right; }
 
 /* ---------- Karussells ---------- */
-.rail { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain;
+.rail { display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain;
   margin: 14px calc(-1 * max(16px, env(safe-area-inset-right, 0px))) 0 calc(-1 * max(16px, env(safe-area-inset-left, 0px)));
   padding: 0 max(16px, env(safe-area-inset-right, 0px)) 4px max(16px, env(safe-area-inset-left, 0px));
   scroll-padding-inline: max(16px, env(safe-area-inset-left, 0px)); }
 .rail::-webkit-scrollbar { display: none; }
 @media (min-width: 1152px) { .rail { margin-inline: 0; padding-inline: 0; scroll-padding-inline: 0; } }
+#regRail { scroll-snap-type: x mandatory; }
 
-.card { flex: none; width: min(76vw, 300px); scroll-snap-align: start; cursor: pointer; min-width: 0; }
-.card .cv { position: relative; aspect-ratio: 4 / 5; border-radius: 14px; overflow: hidden; background: var(--surface); max-width: 100%; }
+.card { flex: none; width: 150px; scroll-snap-align: start; cursor: pointer; min-width: 0; }
+.card .cv { position: relative; aspect-ratio: 4 / 5; border-radius: 10px; overflow: hidden; background: var(--surface); max-width: 100%; }
 .card .cv img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; }
 .card:hover .cv img { transform: scale(1.03); }
-.card .c-date { margin-top: 10px; font-size: 12.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--fg); font-variant-numeric: tabular-nums; }
-.card h3 { font-family: var(--font-display); font-size: 19px; line-height: 1.18; letter-spacing: -.015em; margin: 3px 0 0; text-wrap: balance; }
-.card .c-place { color: var(--fg2); font-size: 14px; margin-top: 3px; }
-.card .c-price { font-size: 14px; font-weight: 600; margin-top: 6px; }
+.card .c-date { margin-top: 7px; font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--fg); font-variant-numeric: tabular-nums; }
+.card h3 { font-family: var(--font-display); font-size: 13.5px; line-height: 1.2; letter-spacing: -.01em; margin: 2px 0 0; text-wrap: balance; }
+.card .c-place { color: var(--fg2); font-size: 12px; margin-top: 2px; }
+.card .c-price { font-size: 12px; font-weight: 600; margin-top: 3px; }
 .card.md { width: min(60vw, 230px); }
-.card.md .cv { aspect-ratio: 1 / 1; }
-.card.md h3 { font-size: 17px; }
-.card.sm { width: 148px; scroll-snap-align: start; }
-.card.sm .cv { aspect-ratio: 1 / 1; border-radius: 12px; }
-.card.sm .c-date { margin-top: 8px; font-size: 11.5px; }
-.card.sm h3 { font-size: 15px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.card.sm .c-place { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card.md .cv { aspect-ratio: 1 / 1; border-radius: 14px; }
+.card.md .c-date { margin-top: 10px; font-size: 12.5px; }
+.card.md h3 { font-size: 17px; line-height: 1.18; margin-top: 3px; }
+.card.md .c-place, .card.md .c-price { font-size: 14px; margin-top: 3px; }
+.card.sm { width: 112px; }
+.card.sm .cv { aspect-ratio: 1 / 1; border-radius: 8px; }
+.card.sm .c-date { margin-top: 6px; font-size: 10px; }
+.card.sm h3 { font-size: 12.5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.card.sm .c-place { font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* Merkmal und Herz auf dem Cover */
-.pill { position: absolute; left: 10px; top: 10px; font-size: 11.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #fff; background: rgba(0,0,0,.5); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: 6px 9px; border-radius: 7px; line-height: 1; }
-.card.sm .pill { left: 8px; top: 8px; font-size: 10.5px; padding: 5px 7px; }
+.pill { position: absolute; left: 6px; top: 6px; font-size: 9px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #fff; background: rgba(0,0,0,.5); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: 4px 6px; border-radius: 5px; line-height: 1; }
 .heart { appearance: none; border: 0; background: none; width: 44px; height: 44px; display: grid; place-items: center; cursor: pointer; color: var(--fg2); flex: none; border-radius: 50%; -webkit-tap-highlight-color: transparent; }
 .heart[aria-pressed="true"] { color: var(--heart); }
 .heart:active .ico { transform: scale(.85); }
-.cv .heart { position: absolute; right: 4px; top: 4px; color: #fff; }
-.cv .heart span { width: 34px; height: 34px; border-radius: 50%; background: rgba(0,0,0,.42); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: grid; place-items: center; }
+.cv .heart { position: absolute; right: 0; top: 0; width: 40px; height: 40px; color: #fff; }
+.cv .heart span { width: 26px; height: 26px; border-radius: 50%; background: rgba(0,0,0,.42); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: grid; place-items: center; }
 .cv .heart[aria-pressed="true"] span { background: #fff; color: var(--heart); }
-.cv .heart .ico { width: 19px; height: 19px; }
-.card.sm .cv .heart { right: 0; top: 0; }
-.card.sm .cv .heart span { width: 30px; height: 30px; }
+.cv .heart .ico { width: 15px; height: 15px; }
+.card.md .cv .heart { right: 4px; top: 4px; width: 44px; height: 44px; }
+.card.md .cv .heart span { width: 34px; height: 34px; }
+.card.md .cv .heart .ico { width: 19px; height: 19px; }
 
 /* ---------- Tagesleiste ---------- */
 .days { position: sticky; top: calc(env(safe-area-inset-top, 0px) + var(--bar-h)); z-index: 15; background: var(--glass); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid var(--line); margin-top: 30px; }
-.days-strip { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-block: 8px; height: var(--days-h); align-items: center; }
+.days-strip { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-block: 6px; height: var(--days-h); align-items: center; }
 .days-strip::-webkit-scrollbar { display: none; }
-.dbtn { appearance: none; border: 1px solid var(--line); background: none; flex: none; width: 62px; height: 60px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; cursor: pointer; color: var(--fg); }
-.dbtn small { font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--fg2); }
-.dbtn b { font-size: 20px; line-height: 1.05; font-variant-numeric: tabular-nums; font-weight: 700; }
+.dbtn { appearance: none; border: 1px solid var(--line); background: none; flex: none; width: 50px; height: 48px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; cursor: pointer; color: var(--fg); }
+.dbtn small { font-size: 9.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--fg2); }
+.dbtn b { font-size: 16px; line-height: 1.05; font-variant-numeric: tabular-nums; font-weight: 700; }
 .dbtn .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--fg); margin-top: 2px; }
 .dbtn[aria-current="true"] { background: var(--fg); border-color: var(--fg); color: var(--bg); }
 .dbtn[aria-current="true"] small { color: var(--bg); opacity: .7; }
@@ -140,14 +136,12 @@ h1 { font-family: var(--font-display); font-size: clamp(30px, 8.4vw, 44px); line
 .dbtn:disabled { opacity: .35; cursor: default; }
 
 /* ---------- Tagesliste ---------- */
-.day { padding-top: 22px; scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--bar-h) + var(--days-h) + 4px); }
+.day { padding-top: 22px; }
 .day-h { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
 .day-h h2 { font-family: var(--font-display); font-size: 26px; letter-spacing: -.02em; margin: 0; }
 .day-h .d { color: var(--fg2); font-size: 15px; }
 .day-h .n { margin-left: auto; color: var(--fg2); font-size: 13px; }
-.lbl { font-size: 11.5px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--fg2); margin: 16px 0 0; display: flex; align-items: center; gap: 6px; }
-.lbl .ico { width: 15px; height: 15px; }
-.day .rail { margin-top: 10px; }
+.day .rail { margin-top: 12px; }
 .table { margin-top: 14px; border-top: 1px solid var(--line); }
 .row { display: grid; grid-template-columns: 50px 52px minmax(0, 1fr) 44px; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); cursor: pointer; min-height: 72px; }
 .row:hover { background: linear-gradient(90deg, transparent, var(--surface) 8%, var(--surface) 92%, transparent); }
@@ -156,18 +150,17 @@ h1 { font-family: var(--font-display); font-size: clamp(30px, 8.4vw, 44px); line
 .row .thumb { width: 52px; height: 52px; border-radius: 8px; object-fit: cover; background: var(--surface); }
 .row .main { min-width: 0; }
 .row .ti { font-weight: 650; font-size: 15.5px; line-height: 1.25; overflow-wrap: anywhere; }
-.row .su { display: flex; gap: 6px 8px; align-items: center; flex-wrap: wrap; margin-top: 4px; font-size: 13px; color: var(--fg2); }
-.row .su .pl { min-width: 0; }
+.row .su { margin-top: 3px; font-size: 13px; color: var(--fg2); }
 .tag { font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; padding: 3px 6px; border-radius: 5px; line-height: 1.2; white-space: nowrap; }
 .tag-einmalig, .tag-selten { background: var(--fg); color: var(--bg); }
 .tag-jaehrlich { box-shadow: inset 0 0 0 1px var(--line-strong); color: var(--fg); }
 .tag-regelmaessig { color: var(--fg2); padding-left: 0; }
+.row .cat { display: none; }
 @media (min-width: 760px) {
   .row { grid-template-columns: 64px 56px minmax(0, 1fr) 150px 44px; }
   .row .thumb { width: 56px; height: 56px; }
-  .row .cat { display: block !important; font-size: 13.5px; color: var(--fg2); }
+  .row .cat { display: block; font-size: 13.5px; color: var(--fg2); }
 }
-.row .cat { display: none; }
 .empty { color: var(--fg2); padding: 18px 0; font-size: 14.5px; }
 
 footer { color: var(--fg2); font-size: 12.5px; text-align: center; padding-block: 36px calc(36px + env(safe-area-inset-bottom, 0px)); }
@@ -226,26 +219,16 @@ footer a { color: var(--fg); }
 <main>
   <div class="wrap intro">
     <p class="today" id="today"></p>
-    <h1>Was ist los in Chemnitz</h1>
     <nav class="filters" id="filters" aria-label="Kategorien"></nav>
-    <p class="learn" id="learn"></p>
   </div>
 
   <!-- 1. Großes Karussell: Einmaliges und Besonderes -->
   <section class="wrap sec" aria-labelledby="hlTitle">
     <div class="sec-head">
-      <div><h2 id="hlTitle">Besondere Momente</h2><p>Einmalig, selten oder nur einmal im Jahr</p></div>
-      <div class="sec-tools">
-        <div class="seg" id="period" role="group" aria-label="Zeitraum">
-          <button data-p="woche" aria-pressed="true">Woche</button><button data-p="monat" aria-pressed="false">Monat</button>
-        </div>
-      </div>
+      <h2 id="hlTitle">Besondere Momente</h2>
+      <div class="arrows"><button class="arrow" data-scroll="heroRail" data-dir="-1" aria-label="Zurück"></button><button class="arrow" data-scroll="heroRail" data-dir="1" aria-label="Weiter"></button></div>
     </div>
     <div class="rail" id="heroRail" aria-roledescription="Karussell"></div>
-    <div class="sec-head" style="margin-top:10px;justify-content:flex-end">
-      <div class="arrows"><button class="arrow" data-scroll="heroRail" data-dir="-1" aria-label="Zurück"></button><button class="arrow" data-scroll="heroRail" data-dir="1" aria-label="Weiter"></button></div>
-      <span class="counter" id="heroCount"></span>
-    </div>
   </section>
 
   <!-- 2. Tagesleiste -->
@@ -265,6 +248,7 @@ footer a { color: var(--fg); }
     <div class="rail" id="regRail"></div>
   </section>
 
+  <div class="toast" id="toast" role="status" hidden></div>
   <footer class="wrap">Entwurf 4 · Alle Veranstaltungen sind erfunden · <a href="index.html">Alle Entwürfe</a></footer>
 </main>
 
@@ -309,14 +293,7 @@ footer a { color: var(--fg); }
     ['a13', 5, '23:00', '05:00', 'musik', 'einmalig', 'Einmaliger Gastauftritt', 'Clubnacht mit Gästen aus Tokio', 'Atomino', 'Zentrum', '14 €', 'Drei DJs aus Tokio spielen zum ersten Mal in Sachsen. Einlass ab 18 Jahren.'],
     ['a14', 6, '10:00', '16:00', 'markt', 'jaehrlich', 'Einmal im Jahr', 'Hinterhof-Flohmarkt', 'Rund um den Lessingplatz', 'Sonnenberg', 'Eintritt frei', 'Über 40 Höfe öffnen ihre Tore. Ein Plan mit allen Stationen liegt am Lessingplatz aus.'],
     ['a15', 6, '12:00', '18:00', 'musik', 'jaehrlich', 'Zweimal im Jahr', 'Plattenbörse', 'Atomino', 'Zentrum', '2 €', 'Händler und Sammler verkaufen Vinyl, Kassetten und CDs. Plattenspieler zum Probehören stehen bereit.'],
-    ['a16', 6, '11:00', '15:00', 'kultur', 'selten', 'Nur alle 3 Jahre', 'Die große Dampfmaschine läuft', 'Industriemuseum', 'Altchemnitz', 'Museumseintritt', 'Die historische Dampfmaschine wird nur alle paar Jahre angeheizt. Zuschauen, hören, riechen.'],
-    // später im Monat (nur im Karussell bei „Monat“)
-    ['b01', 9, '17:00', '20:00', 'musik', 'selten', 'Alle 4 Jahre', 'Chorfest der Partnerstädte', 'Stadthalle', 'Zentrum', '10 €', 'Chöre aus acht Partnerstädten singen einzeln und am Ende gemeinsam ein eigens geschriebenes Stück.'],
-    ['b02', 12, '16:00', '22:00', 'kultur', 'jaehrlich', 'Einmal im Jahr', 'Nacht der offenen Werkstätten', 'Verschiedene Orte', 'Schloßchemnitz', 'Kostenlos', 'Tischlereien, Druckereien und Ateliers zeigen, woran sie arbeiten. Ein Bus verbindet die Stationen.'],
-    ['b03', 15, '19:30', '21:00', 'musik', 'einmalig', 'Einmaliges Konzert', 'Konzert im alten Wasserturm', 'Wasserturm', 'Kaßberg', '18 €, nur 40 Plätze', 'Ein Bläserensemble nutzt den Nachhall des leeren Wasserturms für ein eigens komponiertes Programm.'],
-    ['b04', 19, '17:00', '19:00', 'sport', 'jaehrlich', 'Einmal im Jahr', 'Lichterlauf im Küchwald', 'Küchwald', 'Schloßchemnitz', '8 €', 'Fünf Kilometer mit Stirnlampe durch den beleuchteten Wald. Für Läufer und Spaziergänger.'],
-    ['b05', 23, '19:00', '21:30', 'kultur', 'einmalig', 'Uraufführung', 'Uraufführung: Kammeroper „Spinnerei“', 'Opernhaus, Probebühne', 'Zentrum', '22 €', 'Eine neue Kammeroper über die Textilarbeiterinnen der Stadt, komponiert für sechs Stimmen und Ensemble.'],
-    ['b06', 27, '10:00', '17:00', 'fuehrung', 'einmalig', 'Einmalig geöffnet', 'Tag des Schaudepots', 'Depot der Kunstsammlungen', 'Altchemnitz', 'Kostenlos, Zeitfenster buchen', 'Das sonst verschlossene Depot öffnet für einen Tag. Restauratorinnen erklären ihre Arbeit.']
+    ['a16', 6, '11:00', '15:00', 'kultur', 'selten', 'Nur alle 3 Jahre', 'Die große Dampfmaschine läuft', 'Industriemuseum', 'Altchemnitz', 'Museumseintritt', 'Die historische Dampfmaschine wird nur alle paar Jahre angeheizt. Zuschauen, hören, riechen.']
   ];
 
   // Regelmäßige Reihen: an welchen Wochentagen (0 = Sonntag) sie stattfinden
@@ -358,7 +335,6 @@ footer a { color: var(--fg); }
   let favs = load('wilc4-merkliste', []);
   let interest = load('wilc4-interessen', {});
   let active = new Set(CATEGORIES.map(c => c.id)); // beim Start: alle an
-  let period = 'woche';
 
   const isFav = id => favs.includes(id);
   function toggleFav(id) {
@@ -400,7 +376,6 @@ footer a { color: var(--fg); }
     pin: svg('<path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/>'),
     ticket: svg('<path d="M4 7.5A1.5 1.5 0 0 1 5.5 6h13A1.5 1.5 0 0 1 20 7.5V10a2 2 0 0 0 0 4v2.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 16.5V14a2 2 0 0 0 0-4z"/>'),
     repeat: svg('<path d="M17 2.5 20.5 6 17 9.5"/><path d="M3.5 11.5V10a4 4 0 0 1 4-4h13"/><path d="M7 21.5 3.5 18 7 14.5"/><path d="M20.5 12.5V14a4 4 0 0 1-4 4h-13"/>'),
-    star: svg('<path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/>'),
     spark: svg('<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6.3 6.3l2.5 2.5M15.2 15.2l2.5 2.5M6.3 17.7l2.5-2.5M15.2 8.8l2.5-2.5"/>'),
     left: svg('<path d="m15 6-6 6 6 6"/>'), right: svg('<path d="m9 6 6 6-6 6"/>')
   };
@@ -480,7 +455,7 @@ footer a { color: var(--fg); }
   const coverCache = {};
   function cover(key) {
     if (coverCache[key]) return coverCache[key];
-    const S = 560, cv = document.createElement('canvas'); cv.width = cv.height = S;
+    const S = 480, cv = document.createElement('canvas'); cv.width = cv.height = S;
     paintCover(cv.getContext('2d'), key, S);
     return (coverCache[key] = cv.toDataURL('image/jpeg', .86));
   }
@@ -496,7 +471,7 @@ footer a { color: var(--fg); }
     const regular = ev.rhythm === 'regelmaessig';
     const dateLine = regular ? `${esc(ev.rhythmText)} · ${ev.time}` : `${shortDate(ev)} · ${ev.time}`;
     return `<article class="card ${size || ''}" data-id="${ev.id}" tabindex="0" aria-label="${esc(ev.title)}">
-      <div class="cv"><img src="${cover(ev.cover)}" alt="" loading="lazy">
+      <div class="cv"><img src="${cover(ev.cover)}" alt="">
         ${regular ? '' : `<span class="pill">${RHYTHM[ev.rhythm].label}</span>`}${heartBtn(ev, true)}</div>
       <div class="c-date">${dateLine}</div>
       <h3>${esc(ev.title)}</h3>
@@ -507,9 +482,9 @@ footer a { color: var(--fg); }
   function row(ev) {
     return `<div class="row" data-id="${ev.id}" tabindex="0" role="button" aria-label="${esc(ev.title)}, ${ev.time} Uhr">
       <div class="time">${ev.time}<small>bis ${ev.end}</small></div>
-      <img class="thumb" src="${cover(ev.cover)}" alt="" loading="lazy">
+      <img class="thumb" src="${cover(ev.cover)}" alt="">
       <div class="main"><div class="ti">${esc(ev.title)}</div>
-        <div class="su"><span class="tag tag-${ev.rhythm}">${RHYTHM[ev.rhythm].label}</span><span class="pl">${esc(ev.place)}</span></div></div>
+        <div class="su">${esc(ev.place)}</div></div>
       <div class="cat">${catName(ev.cat)}</div>
       ${heartBtn(ev)}
     </div>`;
@@ -527,27 +502,24 @@ footer a { color: var(--fg); }
     document.getElementById('filters').innerHTML =
       `<button class="flt all" data-cat="" aria-pressed="${all}">Alle</button>` +
       CATEGORIES.map(c => `<button class="flt" data-cat="${c.id}" aria-pressed="${active.has(c.id)}">${esc(c.name)}</button>`).join('');
+  }
+
+  // Kleine Blase unten, erscheint nach jeder Filteränderung für 7 Sekunden
+  const toast = document.getElementById('toast');
+  let toastTimer = 0;
+  function showToast() {
     const top = topInterests();
-    document.getElementById('learn').innerHTML = top.length
-      ? `${I.spark}<span>Für dich weiter oben: <strong>${top.join(', ')}</strong></span><button id="resetLearn">Zurücksetzen</button>`
-      : `${I.spark}<span>Die Seite merkt sich, was dich interessiert, und sortiert passend.</span>`;
+    toast.innerHTML = `${I.spark}<span>Die Seite merkt sich, was dich interessiert, und sortiert passend.${top.length ? `<br><strong>Weiter oben: ${top.join(', ')}</strong>` : ''}</span>${top.length ? '<button id="resetLearn">Zurücksetzen</button>' : ''}`;
+    toast.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { toast.hidden = true; }, 7000);
   }
 
   function renderHero() {
-    const max = period === 'woche' ? LIST_DAYS - 1 : 30;
-    const list = rank(EVENTS.filter(e => e.rhythm !== 'regelmaessig' && e.day <= max && shown(e)));
-    const rail = document.getElementById('heroRail');
-    rail.innerHTML = list.length ? list.map(e => card(e)).join('') : `<p class="empty">Keine besonderen Termine in den gewählten Kategorien.</p>`;
-    rail.scrollLeft = 0;
-    updateCounter();
-  }
-  function updateCounter() {
-    const rail = document.getElementById('heroRail'), n = rail.querySelectorAll('.card').length;
-    const first = rail.querySelector('.card');
-    if (!first) { document.getElementById('heroCount').textContent = ''; return; }
-    const step = first.offsetWidth + 12;
-    const i = Math.min(n, Math.round(rail.scrollLeft / step) + 1);
-    document.getElementById('heroCount').textContent = `${i} / ${n}`;
+    const list = rank(EVENTS.filter(e => e.rhythm !== 'regelmaessig' && shown(e)));
+    heroRail.innerHTML = list.length ? list.map(e => card(e)).join('') : `<p class="empty">Keine besonderen Termine in den gewählten Kategorien.</p>`;
+    heroRail.scrollLeft = 0;
+    autoScroll(heroRail, 30);
   }
 
   function renderDays() {
@@ -559,7 +531,7 @@ footer a { color: var(--fg); }
         <small>${n === 0 ? 'Heute' : n === 1 ? 'Morgen' : WD[d.getDay()].slice(0, 2)}</small><b>${d.getDate()}</b>${special ? '<span class="dot" title="Besonderes an diesem Tag"></span>' : ''}</button>`;
     }
     document.getElementById('days').innerHTML = html;
-    spy();
+    spy(true);
   }
 
   function renderList() {
@@ -567,14 +539,20 @@ footer a { color: var(--fg); }
     for (let n = 0; n < LIST_DAYS; n++) {
       const d = dayDate(n);
       const all = EVENTS.filter(e => e.day === n && shown(e));
-      const hl = rank(all.filter(e => e.rhythm !== 'regelmaessig'));
+      const hl = dayHighlights(all);
       html += `<section class="day" id="tag-${n}" data-day="${n}">
         <div class="day-h"><h2>${relDay(n)}</h2><span class="d">${n < 2 ? WD[d.getDay()] + ', ' : ''}${d.getDate()}. ${MO[d.getMonth()]}</span><span class="n">${all.length} ${all.length === 1 ? 'Termin' : 'Termine'}</span></div>
-        ${hl.length ? `<div class="lbl">${I.star}Highlights ${n === 0 ? 'heute' : n === 1 ? 'morgen' : 'am ' + WD[d.getDay()]}</div><div class="rail">${hl.map(e => card(e, 'sm')).join('')}</div>` : ''}
+        ${hl.length ? `<div class="rail" aria-label="Highlights">${hl.map(e => card(e, 'sm')).join('')}</div>` : ''}
         ${all.length ? `<div class="table">${byTime(all).map(row).join('')}</div>` : `<p class="empty">Keine Termine in den gewählten Kategorien.</p>`}
       </section>`;
     }
     document.getElementById('list').innerHTML = html;
+    document.querySelectorAll('.day .rail').forEach(r => autoScroll(r, 22));
+  }
+  function dayHighlights(all) {
+    const special = rank(all.filter(e => e.rhythm !== 'regelmaessig'));
+    if (special.length >= 3) return special;
+    return special.concat(rank(all.filter(e => e.rhythm === 'regelmaessig')).slice(0, 3 - special.length));
   }
 
   function renderRegular() {
@@ -615,12 +593,7 @@ footer a { color: var(--fg); }
     else if (active.has(id)) active.delete(id);
     else { active.add(id); track(id, 1); }
     renderAll();
-  });
-  document.getElementById('period').addEventListener('click', e => {
-    const b = e.target.closest('[data-p]'); if (!b) return;
-    period = b.dataset.p;
-    document.querySelectorAll('#period button').forEach(x => x.setAttribute('aria-pressed', x === b));
-    renderHero();
+    showToast();
   });
 
   document.addEventListener('click', e => {
@@ -628,8 +601,8 @@ footer a { color: var(--fg); }
     const f = e.target.closest('[data-fav]');
     if (f) { e.stopPropagation(); toggleFav(f.dataset.fav); return; }
     const s = e.target.closest('[data-scroll]');
-    if (s) { const r = document.getElementById(s.dataset.scroll); pauseAuto(r); r.scrollBy({ left: s.dataset.dir * r.clientWidth * .8, behavior: 'smooth' }); return; }
-    if (e.target.id === 'resetLearn') { interest = {}; save('wilc4-interessen', interest); renderAll(); return; }
+    if (s) { const r = document.getElementById(s.dataset.scroll); pause(r, 3000); r.scrollBy({ left: s.dataset.dir * r.clientWidth * .8, behavior: 'smooth' }); return; }
+    if (e.target.id === 'resetLearn') { interest = {}; save('wilc4-interessen', interest); toast.hidden = true; renderAll(); return; }
     const day = e.target.closest('.dbtn');
     if (day) { jumpTo(+day.dataset.day); return; }
     const item = e.target.closest('[data-id]');
@@ -664,35 +637,57 @@ footer a { color: var(--fg); }
       strip.scrollTo({ left, behavior: reduced ? 'auto' : 'smooth' });
     }
   }
-  function spy() {
+  function spy(force) {
     const off = stickyOffset() + 8;
     let n = 0;
     document.querySelectorAll('.day').forEach(s => { if (s.getBoundingClientRect().top <= off) n = +s.dataset.day; });
-    current = -1; markDay(n);
+    if (force) current = -1;
+    markDay(n);
   }
   let spyRaf = 0;
-  window.addEventListener('scroll', () => { cancelAnimationFrame(spyRaf); spyRaf = requestAnimationFrame(() => {
-    const off = stickyOffset() + 8; let n = 0;
-    document.querySelectorAll('.day').forEach(s => { if (s.getBoundingClientRect().top <= off) n = +s.dataset.day; });
-    markDay(n);
-  }); }, { passive: true });
+  window.addEventListener('scroll', () => { cancelAnimationFrame(spyRaf); spyRaf = requestAnimationFrame(() => spy()); }, { passive: true });
 
-  // Großes Karussell läuft automatisch weiter (pausiert beim Anfassen)
+  // Karussells laufen gleichmäßig durch. Kopien der Karten hängen hinten an,
+  // damit es ohne Sprung endlos weitergeht. Anfassen, Wischen oder Maus darüber hält kurz an.
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const heroRail = document.getElementById('heroRail');
-  let pausedUntil = 0;
-  function pauseAuto(rail) { if (rail === heroRail) pausedUntil = Date.now() + 8000; }
-  ['pointerdown', 'touchstart', 'wheel', 'focusin'].forEach(t => heroRail.addEventListener(t, () => pauseAuto(heroRail), { passive: true }));
-  heroRail.addEventListener('mouseenter', () => pausedUntil = Infinity);
-  heroRail.addEventListener('mouseleave', () => pausedUntil = Date.now() + 2000);
-  heroRail.addEventListener('scroll', () => requestAnimationFrame(updateCounter), { passive: true });
-  if (!reduced) setInterval(() => {
-    if (Date.now() < pausedUntil || document.hidden || document.querySelector('.backdrop')) return;
-    const first = heroRail.querySelector('.card'); if (!first) return;
-    const step = first.offsetWidth + 12, max = heroRail.scrollWidth - heroRail.clientWidth;
-    const next = heroRail.scrollLeft + step > max + 2 ? 0 : heroRail.scrollLeft + step;
-    heroRail.scrollTo({ left: next, behavior: 'smooth' });
-  }, 4500);
+  const running = new Map();   // Karussell -> { set, speed, pos, until, visible }
+  const seen = new IntersectionObserver(list => list.forEach(x => { const a = running.get(x.target); if (a) a.visible = x.isIntersecting; }));
+  function pause(rail, ms) { const a = running.get(rail); if (a) a.until = Date.now() + ms; }
+  function autoScroll(rail, speed) {
+    const items = [...rail.querySelectorAll('.card')];
+    if (reduced || items.length < 2) { running.delete(rail); return; }
+    const last = items[items.length - 1];
+    const set = last.offsetLeft + last.offsetWidth + parseFloat(getComputedStyle(rail).columnGap) - items[0].offsetLeft;
+    for (let k = Math.ceil(rail.clientWidth / set); k > 0; k--) items.forEach(el => {
+      const c = el.cloneNode(true);
+      c.setAttribute('aria-hidden', 'true');
+      c.tabIndex = -1; c.querySelectorAll('button').forEach(b => { b.tabIndex = -1; });
+      rail.appendChild(c);
+    });
+    if (!running.has(rail)) {
+      ['pointerdown', 'focusin'].forEach(t => rail.addEventListener(t, () => pause(rail, Infinity), { passive: true }));
+      ['pointerup', 'pointercancel', 'touchend', 'focusout', 'wheel'].forEach(t => rail.addEventListener(t, () => pause(rail, 2500), { passive: true }));
+      rail.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') pause(rail, Infinity); });
+      rail.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') pause(rail, 1000); });
+      seen.observe(rail);
+    }
+    running.set(rail, { set, speed, pos: rail.scrollLeft, until: 0, visible: true });
+  }
+  let lastT = 0;
+  function tick(t) {
+    const dt = lastT ? Math.min(t - lastT, 50) : 0; lastT = t;
+    if (!document.hidden && !document.querySelector('.backdrop')) running.forEach((a, rail) => {
+      if (!rail.isConnected) { seen.unobserve(rail); running.delete(rail); return; }
+      if (!a.visible || Date.now() < a.until) return;
+      if (Math.abs(rail.scrollLeft - a.pos) > 2) a.pos = rail.scrollLeft;   // nach dem Wischen dort weitermachen
+      a.pos += a.speed * dt / 1000;
+      if (a.pos >= a.set) a.pos -= a.set;
+      rail.scrollLeft = a.pos;
+    });
+    requestAnimationFrame(tick);
+  }
+  if (!reduced) requestAnimationFrame(tick);
 
   /* =========================================================
      8. Fenster: Details, Merkliste, Teilen
