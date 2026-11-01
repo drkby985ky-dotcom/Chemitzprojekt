@@ -1,0 +1,44 @@
+/* Impressum und Datenschutz: gleiche ruhige Gestaltung wie die Startseite (Entwurf 4) */
+:root {
+  --bg: #FFFFFF; --surface: #F4F4F5; --fg: #0B0B0C; --fg2: #6B6B72; --line: rgba(11,11,12,.09);
+  --glass: rgba(255,255,255,.82);
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "Segoe UI", Roboto, Arial, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", "Segoe UI", Roboto, Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #000000; --surface: #161618; --fg: #F5F5F7; --fg2: #9C9CA3; --line: rgba(255,255,255,.09); --glass: rgba(0,0,0,.72); color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --bg: #000000; --surface: #161618; --fg: #F5F5F7; --fg2: #9C9CA3; --line: rgba(255,255,255,.09); --glass: rgba(0,0,0,.72); color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--bg); }
+a { color: var(--fg); text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+.wrap { max-width: 720px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--glass); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid var(--line); }
+.bar .wrap { height: 56px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.brand { font-family: var(--font-display); font-weight: 800; font-size: 19px; letter-spacing: -.02em; text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.brand span { color: var(--fg2); font-weight: 600; }
+.back { font-size: 14px; color: var(--fg2); flex: none; }
+
+main { padding-block: 24px 8px; }
+h1 { font-family: var(--font-display); font-size: clamp(28px, 7vw, 36px); line-height: 1.1; letter-spacing: -.025em; margin: 0 0 6px; }
+h2 { font-family: var(--font-display); font-size: 20px; letter-spacing: -.01em; line-height: 1.25; margin: 34px 0 8px; text-wrap: balance; }
+h3 { font-size: 16px; margin: 20px 0 4px; }
+p, ul { margin: 0 0 12px; max-width: 65ch; }
+ul { padding-left: 20px; }
+li { margin-bottom: 6px; }
+.lead { color: var(--fg2); }
+address { font-style: normal; background: var(--surface); border-radius: 12px; padding: 14px 16px; margin: 0 0 12px; }
+.toc { list-style: none; background: var(--surface); border-radius: 12px; padding: 14px 16px; }
+.toc li { margin: 0; }
+.note { font-size: 14px; color: var(--fg2); }
+
+/* Fußbereich: dezent, aber gut auffindbar (gleich wie auf der Startseite) */
+footer { color: var(--fg2); font-size: 12.5px; text-align: center; padding-block: 36px calc(36px + env(safe-area-inset-bottom, 0px)); }
+.legal { display: flex; justify-content: center; flex-wrap: wrap; gap: 4px 18px; }
+.legal a { color: var(--fg2); }
