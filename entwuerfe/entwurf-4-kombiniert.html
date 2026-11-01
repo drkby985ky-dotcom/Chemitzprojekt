@@ -142,10 +142,10 @@ img { max-width: 100%; display: block; }
 .day-h .n { margin-left: auto; color: var(--fg2); font-size: 13px; }
 .day .rail { margin-top: 12px; }
 .table { margin-top: 14px; border-top: 1px solid var(--line); }
-.row { display: grid; grid-template-columns: 60px 52px minmax(0, 1fr) 44px; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); cursor: pointer; min-height: 72px; }
+.row { display: grid; grid-template-columns: 50px 52px minmax(0, 1fr) 44px; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); cursor: pointer; min-height: 72px; }
 .row:hover { background: linear-gradient(90deg, transparent, var(--surface) 8%, var(--surface) 92%, transparent); }
 .row .time { font-variant-numeric: tabular-nums; font-weight: 700; font-size: 15.5px; line-height: 1.2; }
-.row .time small { display: block; font-weight: 500; font-size: 12.5px; color: var(--fg2); white-space: nowrap; }
+.row .time small { display: block; font-weight: 500; font-size: 12.5px; color: var(--fg2); }
 .row .thumb { width: 52px; height: 52px; border-radius: 8px; object-fit: cover; background: var(--surface); }
 .row .main { min-width: 0; }
 .row .ti { font-weight: 650; font-size: 15.5px; line-height: 1.25; overflow-wrap: anywhere; }
@@ -187,7 +187,8 @@ footer a { color: var(--fg); }
 .btn.primary { background: var(--fg); color: var(--bg); border-color: var(--fg); }
 .btn[aria-pressed="true"] { color: var(--heart); border-color: var(--heart); }
 .note { font-size: 12px; color: var(--fg2); text-align: center; margin: 14px 0 0; }
-.note a { color: var(--fg); }
+.cal-choice { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.cal-choice .btn { background: var(--surface); border-color: transparent; }
 .favlist { list-style: none; margin: 10px 0 0; padding: 0; }
 .favlist li { display: grid; grid-template-columns: 52px minmax(0, 1fr) 44px; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
 .favlist img { width: 52px; height: 52px; border-radius: 8px; object-fit: cover; }
@@ -476,7 +477,7 @@ footer a { color: var(--fg); }
   }
   function row(ev) {
     return `<div class="row" data-id="${ev.id}" tabindex="0" role="button" aria-label="${esc(ev.title)}, ${span(ev)}">
-      <div class="time">${hm(ev.time)}<small>–${hm(ev.end)} Uhr</small></div>
+      <div class="time">${ev.time}<small>–<br>${ev.end}</small></div>
       <img class="thumb" src="${cover(ev.cover)}" alt="">
       <div class="main"><div class="ti">${esc(ev.title)}</div>
         <div class="su">${esc(ev.place)}</div></div>
@@ -712,8 +713,8 @@ footer a { color: var(--fg); }
     const back = document.createElement('div');
     back.className = 'backdrop ' + (cls || '');
     back.innerHTML = `<div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div>${html}</div>`;
-    const close = () => { back.remove(); document.removeEventListener('keydown', onKey); document.body.style.overflow = ''; };
-    const onKey = e => { if (e.key === 'Escape') close(); };
+    const close = () => { back.remove(); document.removeEventListener('keydown', onKey); if (!document.querySelector('.backdrop')) document.body.style.overflow = ''; };
+    const onKey = e => { if (e.key === 'Escape' && back === [...document.querySelectorAll('.backdrop')].pop()) close(); };
     back.addEventListener('click', e => { if (e.target === back || e.target.closest('[data-close]')) close(); });
     document.addEventListener('keydown', onKey);
     document.body.appendChild(back);
@@ -739,22 +740,26 @@ footer a { color: var(--fg); }
       <p class="desc">${esc(ev.desc)}</p>
       <div class="actions">
         <button class="btn" data-dfav aria-pressed="${isFav(ev.id)}">${favLabel()}</button>
-        <button class="btn primary" data-dshare>${I.share}Als Story teilen</button>
-        <a class="btn wide" href="${whatsapp(ev)}" target="_blank" rel="noopener">${I.chat}Per WhatsApp teilen</a>
-        <button class="btn wide" data-dcal>${I.cal}In den Kalender eintragen</button>
+        <button class="btn primary" data-dshare>${I.share}Teilen</button>
+        <button class="btn wide" data-dcal aria-expanded="false">${I.cal}In den Kalender eintragen</button>
+        <div class="cal-choice" hidden>
+          <button class="btn" data-ics>Apple Kalender</button>
+          <a class="btn" href="${googleCal(ev)}" target="_blank" rel="noopener">Google Kalender</a>
+        </div>
         <a class="btn wide" href="${esc(ev.url)}" target="_blank" rel="noopener">${I.out}Zum Veranstalter</a>
       </div>
-      <p class="note">Oder in den <a href="${googleCal(ev)}" target="_blank" rel="noopener">Google Kalender eintragen</a></p>
       <p class="note">Beispielveranstaltung, erfundene Daten</p>`);
     s.sheet.addEventListener('click', e => {
       const b = e.target.closest('[data-dfav]');
       if (b) { toggleFav(ev.id); b.setAttribute('aria-pressed', isFav(ev.id)); b.innerHTML = favLabel(); }
-      if (e.target.closest('[data-dshare]')) { s.close(); openShare(ev); }
-      if (e.target.closest('[data-dcal]')) addToCalendar(ev);
+      if (e.target.closest('[data-dshare]')) share(ev);
+      const c = e.target.closest('[data-dcal]');
+      if (c) { const box = s.sheet.querySelector('.cal-choice'); box.hidden = !box.hidden; c.setAttribute('aria-expanded', !box.hidden); }
+      if (e.target.closest('[data-ics]')) addToCalendar(ev);
     });
   }
 
-  /* ----- Kalender und WhatsApp ----- */
+  /* ----- Kalender ----- */
   const where = ev => `${ev.place}, ${ev.district}, Chemnitz`;
   const stamp = (d, t) => `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}T${t.replace(':', '')}00`;
   function times(ev) {   // endet es nach Mitternacht, zählt der nächste Tag
@@ -762,7 +767,7 @@ footer a { color: var(--fg); }
     if (ev.end <= ev.time) endDay.setDate(endDay.getDate() + 1);
     return [stamp(ev.date, ev.time), stamp(endDay, ev.end)];
   }
-  function addToCalendar(ev) {   // Kalenderdatei (ICS): öffnet sich auf dem iPhone direkt im Kalender
+  function addToCalendar(ev) {   // Apple Kalender: Kalenderdatei (ICS), öffnet sich auf dem iPhone direkt im Kalender
     const [a, b] = times(ev), t = v => v.replace(/[\\;,]/g, m => '\\' + m).replace(/\n/g, '\\n');
     const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Was ist los in Chemnitz//DE', 'BEGIN:VEVENT',
       `UID:${ev.id}-${a}@was-ist-los-in-chemnitz`, `DTSTAMP:${new Date().toISOString().replace(/[-:]|\.\d+/g, '')}`,
@@ -778,7 +783,6 @@ footer a { color: var(--fg); }
     const [a, b] = times(ev), q = encodeURIComponent;
     return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${q(ev.title)}&dates=${a}/${b}&ctz=Europe/Berlin&location=${q(where(ev))}&details=${q(ev.desc + '\n' + ev.url)}`;
   }
-  const whatsapp = ev => 'https://wa.me/?text=' + encodeURIComponent(`*${ev.title}*\n${fmtLong(ev.date)}, ${span(ev)}\n${ev.place}, ${ev.district}\n${ev.url}`);
 
   function openFavorites() {
     const body = () => {
@@ -847,31 +851,27 @@ footer a { color: var(--fg); }
     x.fillText('WAS IST LOS IN CHEMNITZ', P, H - 300);
     return c;
   }
-  function openShare(ev) {
-    const canvas = drawStory(ev);
-    const url = canvas.toDataURL('image/png');
-    let file = null;
+  // Teilen: öffnet das Teilen-Menü des Handys mit fertigem Text und Story-Bild
+  // (WhatsApp, Instagram-Story usw.). Wo es das nicht gibt, z. B. am Computer,
+  // erscheint das Story-Bild in einem Fenster über der Veranstaltung.
+  const shareText = ev => `${ev.title}\n${fmtLong(ev.date)}, ${span(ev)}\n${ev.place}, ${ev.district}\n${ev.url}`;
+  function share(ev) {
+    const url = drawStory(ev).toDataURL('image/png');
+    let data = null;
     try {
       const bin = atob(url.split(',')[1]), arr = new Uint8Array(bin.length);
       for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
-      file = new File([arr], 'chemnitz-story.png', { type: 'image/png' });
+      data = { title: ev.title, text: shareText(ev), files: [new File([arr], 'chemnitz-story.png', { type: 'image/png' })] };
     } catch (_) {}
-    const canShare = !!(file && navigator.canShare && navigator.canShare({ files: [file] }));
-    const s = openSheet(`
-      <div class="sheet-top"><strong>Story-Bild</strong><button class="x" data-close aria-label="Schließen">${I.close}</button></div>
+    if (data && navigator.canShare && navigator.canShare(data)) navigator.share(data).catch(err => { if (err.name !== 'AbortError') showStory(ev, url); });
+    else showStory(ev, url);
+  }
+  function showStory(ev, url) {
+    openSheet(`
+      <div class="sheet-top"><strong>Story-Bild</strong><button class="x" data-close aria-label="Zurück zur Veranstaltung">${I.close}</button></div>
       <img class="share-img" src="${url}" alt="Story-Bild: ${esc(ev.title)}, ${fmtLong(ev.date)}, ${esc(ev.place)}">
-      <p class="share-hint" data-hint>${canShare
-        ? 'Tippe auf „Teilen…“ und wähle Instagram. Dort „Story“ auswählen.'
-        : 'Bild gedrückt halten und „Teilen…“ oder „Zu Fotos hinzufügen“ wählen. Am Computer: Rechtsklick, „Bild speichern“.'}</p>
-      <div class="actions">${canShare ? `<button class="btn primary" data-go>${I.share}Teilen…</button>` : ''}<button class="btn" data-close>Fertig</button></div>`, 'share');
-    const go = s.el.querySelector('[data-go]');
-    if (go) go.addEventListener('click', () => {
-      navigator.share({ files: [file], title: ev.title }).catch(err => {
-        if (err && err.name === 'AbortError') return;
-        s.el.querySelector('[data-hint]').textContent = 'Teilen war nicht möglich. Halte das Bild gedrückt und wähle „Teilen…“.';
-        go.remove();
-      });
-    });
+      <p class="share-hint">Bild gedrückt halten und „Teilen…“ oder „Zu Fotos hinzufügen“ wählen. Am Computer: Rechtsklick, „Bild speichern“.</p>
+      <div class="actions"><a class="btn" href="https://wa.me/?text=${encodeURIComponent(shareText(ev))}" target="_blank" rel="noopener">${I.chat}Per WhatsApp teilen</a><button class="btn" data-close>Fertig</button></div>`, 'share');
   }
 
   renderAll();
