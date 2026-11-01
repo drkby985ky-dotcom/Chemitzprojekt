@@ -10,6 +10,9 @@ Webseite mit Highlights in Chemnitz – seltene und einmalige Veranstaltungen zu
 | `entwurf-1-liste.html` | Ruhige Liste mit großem Highlight-Bereich |
 | `entwurf-2-karten.html` | Große Karten zum Wischen, Kategorien als Reiter |
 | `entwurf-3-tage.html` | Tagesansicht (Heute / Morgen / Diese Woche) mit Merkliste |
+| `entwurf-4-kombiniert.html` | Kombinierter Entwurf im Dice-Stil (eigenständig, ohne `gemeinsam.js`) |
 | `gemeinsam.js` | Beispieldaten, Merkliste, Lernen, Sortierung, Story-Bild |
 
 Öffnen: `entwuerfe/index.html` im Browser doppelklicken. Alle Daten sind erfunden.
+
+Online (GitHub Pages): https://drkby985ky-dotcom.github.io/Chemitzprojekt/

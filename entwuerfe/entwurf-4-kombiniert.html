@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<title>Chemnitz – Entwurf 4</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/*
+ * Entwurf 4 · kombiniert, angelehnt an Dice
+ * Ruhige Schwarz-Weiß-Fläche, Farbe kommt nur aus den Event-Covern.
+ * Von oben: Highlight-Karussell → Tagesleiste (klebt oben) → Tagesliste mit Tages-Highlights → Karussell Regelmäßiges
+ */
+:root {
+  --bg: #FFFFFF;
+  --surface: #F4F4F5;          /* ruhige Flächen */
+  --fg: #0B0B0C;
+  --fg2: #6B6B72;              /* Nebentext */
+  --fg3: #A1A1A8;              /* abgewählte Filter */
+  --line: rgba(11,11,12,.09);
+  --line-strong: rgba(11,11,12,.22);
+  --heart: #FF2D46;
+  --glass: rgba(255,255,255,.82);
+  --scrim: rgba(0,0,0,.4);
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "Segoe UI", Roboto, Arial, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", "Segoe UI", Roboto, Arial, sans-serif;
+  --bar-h: 56px;
+  --days-h: 78px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #000000; --surface: #161618; --fg: #F5F5F7; --fg2: #9C9CA3; --fg3: #5C5C63; --line: rgba(255,255,255,.09); --line-strong: rgba(255,255,255,.26); --heart: #FF4D5E; --glass: rgba(0,0,0,.72); --scrim: rgba(0,0,0,.66); color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --bg: #000000; --surface: #161618; --fg: #F5F5F7; --fg2: #9C9CA3; --fg3: #5C5C63; --line: rgba(255,255,255,.09); --line-strong: rgba(255,255,255,.26); --heart: #FF4D5E; --glass: rgba(0,0,0,.72); --scrim: rgba(0,0,0,.66); color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 15px; line-height: 1.4; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--bg); }
+button { font: inherit; color: inherit; }
+img { max-width: 100%; display: block; }
+:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.ico { width: 22px; height: 22px; flex: none; }
+
+/* ---------- Kopfleiste ---------- */
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--glass); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); }
+.bar-in { height: var(--bar-h); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.brand { font-family: var(--font-display); font-weight: 800; font-size: 19px; letter-spacing: -.02em; color: var(--fg); text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.brand span { color: var(--fg2); font-weight: 600; }
+.fav-btn { appearance: none; border: 0; background: var(--fg); color: var(--bg); height: 40px; padding: 0 14px 0 12px; border-radius: 10px; display: inline-flex; align-items: center; gap: 7px; font-weight: 650; font-size: 14.5px; cursor: pointer; flex: none; }
+.fav-btn .ico { width: 19px; height: 19px; }
+.fav-btn .n { font-variant-numeric: tabular-nums; opacity: .7; }
+.fav-btn.bump { animation: bump .35s ease; }
+@keyframes bump { 50% { transform: scale(1.08); } }
+
+/* ---------- Einleitung + Filter ---------- */
+.intro { padding-block: 14px 0; }
+.today { font-size: 12.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--fg2); margin: 0; }
+h1 { font-family: var(--font-display); font-size: clamp(30px, 8.4vw, 44px); line-height: 1.04; letter-spacing: -.03em; margin: 4px 0 0; font-weight: 800; text-wrap: balance; }
+.filters { display: flex; gap: 2px 20px; overflow-x: auto; scrollbar-width: none; margin: 14px calc(-1 * max(16px, env(safe-area-inset-left, 0px))) 0; padding: 0 max(16px, env(safe-area-inset-left, 0px)); border-bottom: 1px solid var(--line); }
+.filters::-webkit-scrollbar { display: none; }
+.flt { appearance: none; border: 0; background: none; padding: 12px 0 11px; min-height: 44px; font-size: 15.5px; font-weight: 600; color: var(--fg3); white-space: nowrap; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; flex: none; }
+.flt[aria-pressed="true"] { color: var(--fg); border-bottom-color: var(--fg); }
+.flt.all { padding-right: 16px; border-right: 1px solid var(--line); border-bottom-color: transparent; }
+.flt.all[aria-pressed="true"] { color: var(--fg); }
+.learn { display: flex; gap: 8px; align-items: center; font-size: 13px; color: var(--fg2); margin: 12px 0 0; min-height: 20px; }
+.learn .ico { width: 16px; height: 16px; }
+.learn > span { flex: 1; min-width: 0; }
+.learn button { appearance: none; border: 0; background: none; padding: 6px 0; color: var(--fg); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; flex: none; font-size: 13px; }
+
+/* ---------- Abschnittsköpfe ---------- */
+.sec { margin-top: 26px; }
+.sec-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.sec-head h2 { font-family: var(--font-display); font-size: 24px; letter-spacing: -.02em; line-height: 1.1; margin: 0; }
+.sec-head p { margin: 3px 0 0; color: var(--fg2); font-size: 14px; }
+.sec-tools { display: flex; align-items: center; gap: 8px; flex: none; }
+.seg { display: inline-flex; border: 1px solid var(--line-strong); border-radius: 8px; overflow: hidden; }
+.seg button { appearance: none; border: 0; background: none; padding: 0 12px; height: 34px; font-size: 13.5px; font-weight: 600; color: var(--fg2); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+.arrows { display: none; gap: 6px; }
+@media (hover: hover) and (min-width: 760px) { .arrows { display: flex; } }
+.arrow { appearance: none; border: 1px solid var(--line-strong); background: none; width: 34px; height: 34px; border-radius: 8px; display: grid; place-items: center; cursor: pointer; color: var(--fg); }
+.arrow .ico { width: 18px; height: 18px; }
+.counter { font-size: 13px; color: var(--fg2); font-variant-numeric: tabular-nums; min-width: 42px; text-align: right; }
+
+/* ---------- Karussells ---------- */
+.rail { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain;
+  margin: 14px calc(-1 * max(16px, env(safe-area-inset-right, 0px))) 0 calc(-1 * max(16px, env(safe-area-inset-left, 0px)));
+  padding: 0 max(16px, env(safe-area-inset-right, 0px)) 4px max(16px, env(safe-area-inset-left, 0px));
+  scroll-padding-inline: max(16px, env(safe-area-inset-left, 0px)); }
+.rail::-webkit-scrollbar { display: none; }
+@media (min-width: 1152px) { .rail { margin-inline: 0; padding-inline: 0; scroll-padding-inline: 0; } }
+
+.card { flex: none; width: min(76vw, 300px); scroll-snap-align: start; cursor: pointer; min-width: 0; }
+.card .cv { position: relative; aspect-ratio: 4 / 5; border-radius: 14px; overflow: hidden; background: var(--surface); max-width: 100%; }
+.card .cv img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; }
+.card:hover .cv img { transform: scale(1.03); }
+.card .c-date { margin-top: 10px; font-size: 12.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--fg); font-variant-numeric: tabular-nums; }
+.card h3 { font-family: var(--font-display); font-size: 19px; line-height: 1.18; letter-spacing: -.015em; margin: 3px 0 0; text-wrap: balance; }
+.card .c-place { color: var(--fg2); font-size: 14px; margin-top: 3px; }
+.card .c-price { font-size: 14px; font-weight: 600; margin-top: 6px; }
+.card.md { width: min(60vw, 230px); }
+.card.md .cv { aspect-ratio: 1 / 1; }
+.card.md h3 { font-size: 17px; }
+.card.sm { width: 148px; scroll-snap-align: start; }
+.card.sm .cv { aspect-ratio: 1 / 1; border-radius: 12px; }
+.card.sm .c-date { margin-top: 8px; font-size: 11.5px; }
+.card.sm h3 { font-size: 15px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.card.sm .c-place { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Merkmal und Herz auf dem Cover */
+.pill { position: absolute; left: 10px; top: 10px; font-size: 11.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #fff; background: rgba(0,0,0,.5); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: 6px 9px; border-radius: 7px; line-height: 1; }
+.card.sm .pill { left: 8px; top: 8px; font-size: 10.5px; padding: 5px 7px; }
+.heart { appearance: none; border: 0; background: none; width: 44px; height: 44px; display: grid; place-items: center; cursor: pointer; color: var(--fg2); flex: none; border-radius: 50%; -webkit-tap-highlight-color: transparent; }
+.heart[aria-pressed="true"] { color: var(--heart); }
+.heart:active .ico { transform: scale(.85); }
+.cv .heart { position: absolute; right: 4px; top: 4px; color: #fff; }
+.cv .heart span { width: 34px; height: 34px; border-radius: 50%; background: rgba(0,0,0,.42); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: grid; place-items: center; }
+.cv .heart[aria-pressed="true"] span { background: #fff; color: var(--heart); }
+.cv .heart .ico { width: 19px; height: 19px; }
+.card.sm .cv .heart { right: 0; top: 0; }
+.card.sm .cv .heart span { width: 30px; height: 30px; }
+
+/* ---------- Tagesleiste ---------- */
+.days { position: sticky; top: calc(env(safe-area-inset-top, 0px) + var(--bar-h)); z-index: 15; background: var(--glass); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid var(--line); margin-top: 30px; }
+.days-strip { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-block: 8px; height: var(--days-h); align-items: center; }
+.days-strip::-webkit-scrollbar { display: none; }
+.dbtn { appearance: none; border: 1px solid var(--line); background: none; flex: none; width: 62px; height: 60px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; cursor: pointer; color: var(--fg); }
+.dbtn small { font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--fg2); }
+.dbtn b { font-size: 20px; line-height: 1.05; font-variant-numeric: tabular-nums; font-weight: 700; }
+.dbtn .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--fg); margin-top: 2px; }
+.dbtn[aria-current="true"] { background: var(--fg); border-color: var(--fg); color: var(--bg); }
+.dbtn[aria-current="true"] small { color: var(--bg); opacity: .7; }
+.dbtn[aria-current="true"] .dot { background: var(--bg); }
+.dbtn:disabled { opacity: .35; cursor: default; }
+
+/* ---------- Tagesliste ---------- */
+.day { padding-top: 22px; scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--bar-h) + var(--days-h) + 4px); }
+.day-h { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.day-h h2 { font-family: var(--font-display); font-size: 26px; letter-spacing: -.02em; margin: 0; }
+.day-h .d { color: var(--fg2); font-size: 15px; }
+.day-h .n { margin-left: auto; color: var(--fg2); font-size: 13px; }
+.lbl { font-size: 11.5px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--fg2); margin: 16px 0 0; display: flex; align-items: center; gap: 6px; }
+.lbl .ico { width: 15px; height: 15px; }
+.day .rail { margin-top: 10px; }
+.table { margin-top: 14px; border-top: 1px solid var(--line); }
+.row { display: grid; grid-template-columns: 50px 52px minmax(0, 1fr) 44px; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); cursor: pointer; min-height: 72px; }
+.row:hover { background: linear-gradient(90deg, transparent, var(--surface) 8%, var(--surface) 92%, transparent); }
+.row .time { font-variant-numeric: tabular-nums; font-weight: 700; font-size: 15.5px; line-height: 1.2; }
+.row .time small { display: block; font-weight: 500; font-size: 12.5px; color: var(--fg2); }
+.row .thumb { width: 52px; height: 52px; border-radius: 8px; object-fit: cover; background: var(--surface); }
+.row .main { min-width: 0; }
+.row .ti { font-weight: 650; font-size: 15.5px; line-height: 1.25; overflow-wrap: anywhere; }
+.row .su { display: flex; gap: 6px 8px; align-items: center; flex-wrap: wrap; margin-top: 4px; font-size: 13px; color: var(--fg2); }
+.row .su .pl { min-width: 0; }
+.tag { font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; padding: 3px 6px; border-radius: 5px; line-height: 1.2; white-space: nowrap; }
+.tag-einmalig, .tag-selten { background: var(--fg); color: var(--bg); }
+.tag-jaehrlich { box-shadow: inset 0 0 0 1px var(--line-strong); color: var(--fg); }
+.tag-regelmaessig { color: var(--fg2); padding-left: 0; }
+@media (min-width: 760px) {
+  .row { grid-template-columns: 64px 56px minmax(0, 1fr) 150px 44px; }
+  .row .thumb { width: 56px; height: 56px; }
+  .row .cat { display: block !important; font-size: 13.5px; color: var(--fg2); }
+}
+.row .cat { display: none; }
+.empty { color: var(--fg2); padding: 18px 0; font-size: 14.5px; }
+
+footer { color: var(--fg2); font-size: 12.5px; text-align: center; padding-block: 36px calc(36px + env(safe-area-inset-bottom, 0px)); }
+footer a { color: var(--fg); }
+
+/* ---------- Fenster (Details, Merkliste, Teilen) ---------- */
+.backdrop { position: fixed; inset: 0; z-index: 100; background: var(--scrim); display: flex; align-items: flex-end; justify-content: center; animation: fade .2s ease; }
+.sheet { background: var(--bg); color: var(--fg); width: 100%; max-width: 560px; max-height: 92%; overflow: auto; border-radius: 18px 18px 0 0; animation: up .28s cubic-bezier(.2,.8,.2,1);
+  padding: 10px max(20px, env(safe-area-inset-right, 0px)) calc(22px + env(safe-area-inset-bottom, 0px)) max(20px, env(safe-area-inset-left, 0px)); }
+@media (min-width: 700px) { .backdrop { align-items: center; } .sheet { border-radius: 18px; } }
+.grab { width: 36px; height: 5px; border-radius: 3px; background: var(--line-strong); margin: 0 auto 12px; }
+.sheet-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.sheet-top strong { font-size: 20px; font-family: var(--font-display); }
+.x { appearance: none; border: 0; background: var(--surface); width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; color: var(--fg2); flex: none; }
+.x .ico { width: 16px; height: 16px; }
+.d-cover { position: relative; border-radius: 14px; overflow: hidden; aspect-ratio: 16 / 10; margin-top: 4px; max-width: 100%; }
+.d-cover img { width: 100%; height: 100%; object-fit: cover; }
+.d-cover .x { position: absolute; right: 10px; top: 10px; background: rgba(0,0,0,.45); color: #fff; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.d-meta { display: flex; gap: 8px; align-items: center; margin-top: 16px; font-size: 13px; color: var(--fg2); font-weight: 600; }
+.sheet h2 { font-family: var(--font-display); font-size: 27px; line-height: 1.12; letter-spacing: -.02em; margin: 8px 0 0; text-wrap: balance; }
+.facts { list-style: none; margin: 16px 0; padding: 0; border-top: 1px solid var(--line); }
+.facts li { display: flex; gap: 12px; align-items: flex-start; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
+.facts .ico { color: var(--fg2); width: 20px; height: 20px; margin-top: 1px; }
+.facts small { display: block; color: var(--fg2); font-size: 13px; }
+.desc { font-size: 15.5px; line-height: 1.55; margin: 0 0 20px; }
+.actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn { appearance: none; border: 1px solid var(--line-strong); background: none; border-radius: 10px; min-height: 50px; padding: 0 12px; font-size: 15.5px; font-weight: 650; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; color: var(--fg); }
+.btn.primary { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.btn[aria-pressed="true"] { color: var(--heart); border-color: var(--heart); }
+.note { font-size: 12px; color: var(--fg2); text-align: center; margin: 14px 0 0; }
+.favlist { list-style: none; margin: 10px 0 0; padding: 0; }
+.favlist li { display: grid; grid-template-columns: 52px minmax(0, 1fr) 44px; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.favlist img { width: 52px; height: 52px; border-radius: 8px; object-fit: cover; }
+.favlist .open { appearance: none; border: 0; background: none; text-align: left; padding: 0; cursor: pointer; min-width: 0; }
+.favlist b { display: block; font-size: 15.5px; }
+.favlist span { display: block; font-size: 13px; color: var(--fg2); margin-top: 2px; }
+.fav-empty { text-align: center; color: var(--fg2); padding: 26px 0 10px; line-height: 1.5; }
+.share-img { width: min(58vw, 240px); aspect-ratio: 9 / 16; border-radius: 14px; margin: 4px auto 16px; box-shadow: 0 12px 34px rgba(0,0,0,.28); max-width: 100%; -webkit-touch-callout: default; }
+.share-hint { text-align: center; color: var(--fg2); font-size: 14px; line-height: 1.45; margin: 0 auto 16px; max-width: 36ch; }
+.share .actions { grid-template-columns: 1fr; }
+
+@keyframes up { from { transform: translateY(40px); opacity: .4; } to { transform: none; opacity: 1; } }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .backdrop, .sheet, .fav-btn.bump { animation: none; } .card .cv img { transition: none; } }
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="wrap bar-in">
+    <a class="brand" href="#" id="brand">Was ist los <span>in Chemnitz</span></a>
+    <button class="fav-btn" id="favBtn" aria-label="Merkliste öffnen"></button>
+  </div>
+</header>
+
+<main>
+  <div class="wrap intro">
+    <p class="today" id="today"></p>
+    <h1>Was ist los in Chemnitz</h1>
+    <nav class="filters" id="filters" aria-label="Kategorien"></nav>
+    <p class="learn" id="learn"></p>
+  </div>
+
+  <!-- 1. Großes Karussell: Einmaliges und Besonderes -->
+  <section class="wrap sec" aria-labelledby="hlTitle">
+    <div class="sec-head">
+      <div><h2 id="hlTitle">Besondere Momente</h2><p>Einmalig, selten oder nur einmal im Jahr</p></div>
+      <div class="sec-tools">
+        <div class="seg" id="period" role="group" aria-label="Zeitraum">
+          <button data-p="woche" aria-pressed="true">Woche</button><button data-p="monat" aria-pressed="false">Monat</button>
+        </div>
+      </div>
+    </div>
+    <div class="rail" id="heroRail" aria-roledescription="Karussell"></div>
+    <div class="sec-head" style="margin-top:10px;justify-content:flex-end">
+      <div class="arrows"><button class="arrow" data-scroll="heroRail" data-dir="-1" aria-label="Zurück"></button><button class="arrow" data-scroll="heroRail" data-dir="1" aria-label="Weiter"></button></div>
+      <span class="counter" id="heroCount"></span>
+    </div>
+  </section>
+
+  <!-- 2. Tagesleiste -->
+  <nav class="days" aria-label="Zu einem Tag springen">
+    <div class="wrap"><div class="days-strip" id="days"></div></div>
+  </nav>
+
+  <!-- 3. Tagesliste -->
+  <div class="wrap" id="list"></div>
+
+  <!-- 4. Karussell: Regelmäßiges -->
+  <section class="wrap sec" aria-labelledby="regTitle" style="margin-top:44px">
+    <div class="sec-head">
+      <div><h2 id="regTitle">Immer wieder</h2><p>Regelmäßig jede Woche oder jeden Monat</p></div>
+      <div class="arrows"><button class="arrow" data-scroll="regRail" data-dir="-1" aria-label="Zurück"></button><button class="arrow" data-scroll="regRail" data-dir="1" aria-label="Weiter"></button></div>
+    </div>
+    <div class="rail" id="regRail"></div>
+  </section>
+
+  <footer class="wrap">Entwurf 4 · Alle Veranstaltungen sind erfunden · <a href="index.html">Alle Entwürfe</a></footer>
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  /* =========================================================
+     1. Kategorien und Beispieldaten (erfunden)
+     ========================================================= */
+  const CATEGORIES = [
+    { id: 'musik',    name: 'Musik' },
+    { id: 'markt',    name: 'Märkte' },
+    { id: 'kultur',   name: 'Kultur' },
+    { id: 'fuehrung', name: 'Führungen' },
+    { id: 'familie',  name: 'Familie' },
+    { id: 'sport',    name: 'Sport' },
+    { id: 'essen',    name: 'Essen & Trinken' }
+  ];
+  const RHYTHM = {
+    einmalig:     { label: 'Einmalig',        weight: 300 },
+    selten:       { label: 'Alle paar Jahre', weight: 260 },
+    jaehrlich:    { label: 'Jährlich',        weight: 160 },
+    regelmaessig: { label: 'Regelmäßig',      weight: 0 }
+  };
+  const LIST_DAYS = 7; // Tagesleiste: heute + 6 Tage
+
+  // Besondere Termine: [id, Tage ab heute, Beginn, Ende, Kategorie, Merkmal, Rhythmus-Text, Titel, Ort, Stadtteil, Preis, Beschreibung]
+  const SPECIAL = [
+    ['a01', 0, '17:30', '21:00', 'kultur', 'selten', 'Alle 5 Jahre, zuletzt 2021', 'Lichterfahrt der historischen Straßenbahnen', 'Straßenbahnmuseum', 'Kappel', '6 €, Kinder frei', 'Fünf restaurierte Wagen fahren beleuchtet in einer Kolonne über das Museumsgleis. Mitfahrt in jedem Wagen möglich.'],
+    ['a02', 0, '10:00', '16:00', 'markt', 'jaehrlich', 'Einmal im Jahr im Herbst', 'Apfelsortentag', 'Botanischer Garten', 'Altendorf', 'Eintritt frei', 'Pomologen bestimmen Äpfel aus dem eigenen Garten. Dazu frischer Most und über 80 alte Sorten zum Probieren.'],
+    ['a03', 1, '21:00', '23:30', 'musik', 'einmalig', 'Einmalige Veranstaltung', 'Orgelnacht: Drei Orgeln, ein Abend', 'St. Jakobikirche', 'Zentrum', '12 €', 'Zum Abschluss der Orgelsanierung spielen drei Organistinnen auf allen drei Instrumenten der Kirche, teils gleichzeitig. Kerzenlicht, freie Platzwahl.'],
+    ['a04', 1, '14:00', '18:00', 'essen', 'jaehrlich', 'Einmal im Jahr', 'Backtag in der alten Mühle', 'Schlossmühle', 'Schloßchemnitz', 'Eintritt frei', 'Der Holzbackofen wird angeheizt: Kürbisbrot und Zwiebelkuchen. Kinder dürfen selbst Teig kneten.'],
+    ['a05', 2, '20:00', '22:00', 'musik', 'einmalig', 'Einmaliges Konzert', 'Kellerkonzert unter dem Kaßberg', 'Kaßberg-Gänge', 'Kaßberg', '15 €, nur 60 Plätze', 'Ein Streichquartett spielt in den historischen Bierkellern unter dem Kaßberg. Warme Kleidung empfohlen, der Keller hat 9 °C.'],
+    ['a06', 2, '20:30', '22:00', 'kultur', 'jaehrlich', 'Einmal im Jahr', 'Stummfilmnacht mit Live-Klavier', 'Weltecho', 'Zentrum', '9 €', 'Zwei Stummfilmklassiker, live und improvisiert am Flügel begleitet.'],
+    ['a07', 2, '18:00', '19:30', 'kultur', 'einmalig', 'Einmaliger Vortrag', 'Chemnitz von oben: Luftbilder aus 100 Jahren', 'Stadtbibliothek im TIETZ', 'Zentrum', '5 €', 'Ein Fotograf zeigt Luftaufnahmen der Stadt von 1925 bis heute und erzählt, wie sie entstanden sind.'],
+    ['a08', 3, '19:00', '20:30', 'fuehrung', 'jaehrlich', 'Einmal im Jahr', 'Nachtführung im Versteinerten Wald', 'Museum für Naturkunde', 'Zentrum', '10 €, Anmeldung empfohlen', 'Mit Taschenlampen durch die 290 Millionen Jahre alten Baumstämme und die dunkle Ausstellung.'],
+    ['a09', 3, '20:00', '21:15', 'familie', 'einmalig', 'Einmalige Aufführung', 'Live-Hörspiel unter der Sternenkuppel', 'Planetarium', 'Rabenstein', '8 €', 'Sprecher, Geräuschemacher und Musik live, dazu der Sternenhimmel über den Köpfen. Für alle ab 8 Jahren.'],
+    ['a10', 4, '18:00', '22:00', 'kultur', 'einmalig', 'Einmalige Veranstaltung', 'Lichtprojektion am Karl-Marx-Kopf', 'Brückenstraße', 'Zentrum', 'Kostenlos', 'Ein Künstlerkollektiv projiziert für einen Abend Bilder aus 70 Jahren Stadtgeschichte auf das Monument.'],
+    ['a11', 4, '19:00', '21:00', 'sport', 'jaehrlich', 'Einmal im Jahr', 'Volleyball: Finale um den Stadtpokal', 'Sporthalle Brühl', 'Brühl', '5 €', 'Die beiden besten Vereinsteams der Stadt spielen um den Pokal.'],
+    ['a12', 5, '14:00', '19:00', 'familie', 'einmalig', 'Einmalig zur Eröffnung', 'Brückenfest: Die neue Fußgängerbrücke öffnet', 'Ufer am Falkeplatz', 'Zentrum', 'Kostenlos', 'Eröffnung mit Musik, Bastelzelt und Entenrennen auf der Chemnitz.'],
+    ['a13', 5, '23:00', '05:00', 'musik', 'einmalig', 'Einmaliger Gastauftritt', 'Clubnacht mit Gästen aus Tokio', 'Atomino', 'Zentrum', '14 €', 'Drei DJs aus Tokio spielen zum ersten Mal in Sachsen. Einlass ab 18 Jahren.'],
+    ['a14', 6, '10:00', '16:00', 'markt', 'jaehrlich', 'Einmal im Jahr', 'Hinterhof-Flohmarkt', 'Rund um den Lessingplatz', 'Sonnenberg', 'Eintritt frei', 'Über 40 Höfe öffnen ihre Tore. Ein Plan mit allen Stationen liegt am Lessingplatz aus.'],
+    ['a15', 6, '12:00', '18:00', 'musik', 'jaehrlich', 'Zweimal im Jahr', 'Plattenbörse', 'Atomino', 'Zentrum', '2 €', 'Händler und Sammler verkaufen Vinyl, Kassetten und CDs. Plattenspieler zum Probehören stehen bereit.'],
+    ['a16', 6, '11:00', '15:00', 'kultur', 'selten', 'Nur alle 3 Jahre', 'Die große Dampfmaschine läuft', 'Industriemuseum', 'Altchemnitz', 'Museumseintritt', 'Die historische Dampfmaschine wird nur alle paar Jahre angeheizt. Zuschauen, hören, riechen.'],
+    // später im Monat (nur im Karussell bei „Monat“)
+    ['b01', 9, '17:00', '20:00', 'musik', 'selten', 'Alle 4 Jahre', 'Chorfest der Partnerstädte', 'Stadthalle', 'Zentrum', '10 €', 'Chöre aus acht Partnerstädten singen einzeln und am Ende gemeinsam ein eigens geschriebenes Stück.'],
+    ['b02', 12, '16:00', '22:00', 'kultur', 'jaehrlich', 'Einmal im Jahr', 'Nacht der offenen Werkstätten', 'Verschiedene Orte', 'Schloßchemnitz', 'Kostenlos', 'Tischlereien, Druckereien und Ateliers zeigen, woran sie arbeiten. Ein Bus verbindet die Stationen.'],
+    ['b03', 15, '19:30', '21:00', 'musik', 'einmalig', 'Einmaliges Konzert', 'Konzert im alten Wasserturm', 'Wasserturm', 'Kaßberg', '18 €, nur 40 Plätze', 'Ein Bläserensemble nutzt den Nachhall des leeren Wasserturms für ein eigens komponiertes Programm.'],
+    ['b04', 19, '17:00', '19:00', 'sport', 'jaehrlich', 'Einmal im Jahr', 'Lichterlauf im Küchwald', 'Küchwald', 'Schloßchemnitz', '8 €', 'Fünf Kilometer mit Stirnlampe durch den beleuchteten Wald. Für Läufer und Spaziergänger.'],
+    ['b05', 23, '19:00', '21:30', 'kultur', 'einmalig', 'Uraufführung', 'Uraufführung: Kammeroper „Spinnerei“', 'Opernhaus, Probebühne', 'Zentrum', '22 €', 'Eine neue Kammeroper über die Textilarbeiterinnen der Stadt, komponiert für sechs Stimmen und Ensemble.'],
+    ['b06', 27, '10:00', '17:00', 'fuehrung', 'einmalig', 'Einmalig geöffnet', 'Tag des Schaudepots', 'Depot der Kunstsammlungen', 'Altchemnitz', 'Kostenlos, Zeitfenster buchen', 'Das sonst verschlossene Depot öffnet für einen Tag. Restauratorinnen erklären ihre Arbeit.']
+  ];
+
+  // Regelmäßige Reihen: an welchen Wochentagen (0 = Sonntag) sie stattfinden
+  const SERIES = [
+    { id: 'r01', wd: [2, 4, 6], time: '08:00', end: '14:00', cat: 'markt',    freq: 'Jeden Di, Do und Sa', title: 'Wochenmarkt', place: 'Markt', district: 'Zentrum', price: 'Eintritt frei', desc: 'Obst, Gemüse, Käse und Blumen von Händlern aus der Region.' },
+    { id: 'r02', wd: [1, 4],    time: '18:30', end: '19:30', cat: 'sport',    freq: 'Jeden Mo und Do', title: 'Lauftreff am Schloßteich', place: 'Schloßteich', district: 'Schloßchemnitz', price: 'Kostenlos', desc: 'Lockere Runde um den Teich in zwei Tempogruppen. Keine Anmeldung nötig.' },
+    { id: 'r03', wd: [0, 3],    time: '15:00', end: '16:00', cat: 'familie',  freq: 'Jeden Mi und So', title: 'Kindertheater am Nachmittag', place: 'Fritz Theater', district: 'Zentrum', price: '8 €', desc: 'Kurze Stücke für Kinder ab 4 Jahren, gespielt vom Ensemble des Hauses.' },
+    { id: 'r04', wd: [0, 6],    time: '11:00', end: '12:00', cat: 'fuehrung', freq: 'Jeden Sa und So', title: 'Führung durch die Kunstsammlungen', place: 'Kunstsammlungen am Theaterplatz', district: 'Zentrum', price: 'Eintritt + 3 €', desc: 'Ein einstündiger Rundgang mit wechselnden Schwerpunkten.' },
+    { id: 'r05', wd: [6],       time: '14:00', end: '15:00', cat: 'fuehrung', freq: 'Jeden Samstag', title: 'Hausführung im Schauspielhaus', place: 'Schauspielhaus', district: 'Kaßberg', price: '5 €', desc: 'Hinter die Kulissen: Bühnentechnik, Werkstätten und Garderoben.' },
+    { id: 'r06', wd: [2],       time: '20:00', end: '22:30', cat: 'essen',    freq: 'Jeden Dienstag', title: 'Kneipenquiz', place: 'Spinnbau', district: 'Altchemnitz', price: '3 € pro Person', desc: 'Sechs Runden Allgemeinwissen in Teams bis sechs Personen.' },
+    { id: 'r07', wd: [5],       time: '20:00', end: '22:00', cat: 'familie',  freq: 'Jeden Freitag bei klarem Himmel', title: 'Himmelsbeobachtung', place: 'Sternwarte Rabenstein', district: 'Rabenstein', price: '4 €', desc: 'Blick durch das große Teleskop auf Mond, Planeten und Sternhaufen.' },
+    { id: 'r08', wd: [3],       time: '17:00', end: '18:00', cat: 'fuehrung', freq: 'Jeden Mittwoch', title: 'Kuratorenführung', place: 'Schloßbergmuseum', district: 'Schloßchemnitz', price: 'Museumseintritt', desc: 'Die Kuratorin zeigt ausgewählte Stücke der Stadtgeschichte.' },
+    { id: 'r09', wd: [4],       time: '21:00', end: '23:30', cat: 'musik',    freq: 'Jeden Donnerstag', title: 'Jazz-Session', place: 'Weltecho', district: 'Zentrum', price: 'Hut geht rum', desc: 'Offene Bühne: Die Hausband beginnt, danach darf jede und jeder mitspielen.' },
+    { id: 'r10', wd: [5],       time: '16:00', end: '21:00', cat: 'essen',    freq: 'Jeden Freitag', title: 'Feierabendmarkt', place: 'Rosenhof', district: 'Zentrum', price: 'Eintritt frei', desc: 'Streetfood, regionale Weine und Musik zum Wochenende.' },
+    { id: 'r11', wd: [1],       time: '19:00', end: '21:00', cat: 'musik',    freq: 'Jeden Montag', title: 'Offenes Singen', place: 'Lutherkirche', district: 'Lutherviertel', price: 'Kostenlos', desc: 'Volkslieder, Pop und Kanons zum Mitsingen. Keine Vorkenntnisse nötig.' },
+    { id: 'r12', wd: [3],       time: '19:00', end: '20:30', cat: 'kultur',   freq: 'Jeden ersten Mittwoch im Monat', title: 'Lesung: Chemnitzer Stadtgeschichten', place: 'Stadtbibliothek im TIETZ', district: 'Zentrum', price: '4 €', desc: 'Autorinnen und Autoren aus der Region lesen kurze Texte über die Stadt.' }
+  ];
+
+  const TODAY = new Date(); TODAY.setHours(0, 0, 0, 0);
+  const dayDate = n => { const d = new Date(TODAY); d.setDate(d.getDate() + n); return d; };
+
+  const EVENTS = [];
+  SPECIAL.forEach(a => EVENTS.push({ id: a[0], day: a[1], time: a[2], end: a[3], cat: a[4], rhythm: a[5], rhythmText: a[6], title: a[7], place: a[8], district: a[9], price: a[10], desc: a[11], cover: a[0], date: dayDate(a[1]) }));
+  for (let n = 0; n < LIST_DAYS; n++) {
+    const d = dayDate(n);
+    SERIES.forEach(s => {
+      if (s.wd.includes(d.getDay())) EVENTS.push(Object.assign({}, s, { id: `${s.id}-${n}`, series: s.id, day: n, date: d, rhythm: 'regelmaessig', rhythmText: s.freq, cover: s.id }));
+    });
+  }
+  const byId = id => EVENTS.find(e => e.id === id);
+  const catName = id => CATEGORIES.find(c => c.id === id).name;
+
+  /* =========================================================
+     2. Speicher im Browser: Merkliste, Interessen, Filter
+     ========================================================= */
+  const load = (k, f) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : f; } catch (_) { return f; } };
+  const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (_) {} };
+
+  let favs = load('wilc4-merkliste', []);
+  let interest = load('wilc4-interessen', {});
+  let active = new Set(CATEGORIES.map(c => c.id)); // beim Start: alle an
+  let period = 'woche';
+
+  const isFav = id => favs.includes(id);
+  function toggleFav(id) {
+    const ev = byId(id);
+    if (isFav(id)) favs = favs.filter(x => x !== id);
+    else { favs.push(id); if (ev) track(ev.cat, 2); }
+    save('wilc4-merkliste', favs);
+    syncHearts(id);
+  }
+  // Lernen: Veranstaltung öffnen = 1 Punkt, merken = 2, Kategorie wieder einschalten = 1
+  function track(cat, pts) { interest[cat] = Math.max(0, (interest[cat] || 0) + pts); save('wilc4-interessen', interest); }
+  function affinity(cat) { const m = Math.max(0, ...Object.values(interest)); return m ? (interest[cat] || 0) / m : 0; }
+  const topInterests = () => Object.entries(interest).filter(([, v]) => v >= 2).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([id]) => catName(id));
+
+  // Sortierung: Seltenheit zuerst, dann Interesse, dann Nähe
+  const score = e => RHYTHM[e.rhythm].weight + affinity(e.cat) * 70 - e.day * 4;
+  const rank = list => list.slice().sort((a, b) => score(b) - score(a) || a.day - b.day || a.time.localeCompare(b.time));
+  const byTime = list => list.slice().sort((a, b) => a.time.localeCompare(b.time));
+  const shown = e => active.has(e.cat);
+
+  /* =========================================================
+     3. Texte und Symbole
+     ========================================================= */
+  const WD = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
+  const MO = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+  const fmtLong = d => `${WD[d.getDay()]}, ${d.getDate()}. ${MO[d.getMonth()]}`;
+  const relDay = n => n === 0 ? 'Heute' : n === 1 ? 'Morgen' : WD[dayDate(n).getDay()];
+  const shortDate = e => e.day === 0 ? 'Heute' : e.day === 1 ? 'Morgen' : `${WD[e.date.getDay()].slice(0, 2)}, ${e.date.getDate()}. ${MO[e.date.getMonth()].slice(0, 3)}`;
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  const svg = (p, fill) => `<svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="${fill ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+  const HEART = '<path d="M12 20.5s-7.5-4.6-9.3-9.4C1.4 7.6 3.6 4 7.2 4c2 0 3.6 1.1 4.8 2.8C13.2 5.1 14.8 4 16.8 4c3.6 0 5.8 3.6 4.5 7.1-1.8 4.8-9.3 9.4-9.3 9.4z"/>';
+  const I = {
+    heart: svg(HEART), heartFill: svg(HEART, true),
+    share: svg('<path d="M12 3v12"/><path d="M7.5 7.5 12 3l4.5 4.5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>'),
+    close: svg('<path d="M6 6l12 12M18 6 6 18"/>'),
+    cal: svg('<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>'),
+    clock: svg('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>'),
+    pin: svg('<path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/>'),
+    ticket: svg('<path d="M4 7.5A1.5 1.5 0 0 1 5.5 6h13A1.5 1.5 0 0 1 20 7.5V10a2 2 0 0 0 0 4v2.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 16.5V14a2 2 0 0 0 0-4z"/>'),
+    repeat: svg('<path d="M17 2.5 20.5 6 17 9.5"/><path d="M3.5 11.5V10a4 4 0 0 1 4-4h13"/><path d="M7 21.5 3.5 18 7 14.5"/><path d="M20.5 12.5V14a4 4 0 0 1-4 4h-13"/>'),
+    star: svg('<path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/>'),
+    spark: svg('<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6.3 6.3l2.5 2.5M15.2 15.2l2.5 2.5M6.3 17.7l2.5-2.5M15.2 8.8l2.5-2.5"/>'),
+    left: svg('<path d="m15 6-6 6 6 6"/>'), right: svg('<path d="m9 6 6 6-6 6"/>')
+  };
+
+  /* =========================================================
+     4. Bunte Cover – werden aus dem Namen erzeugt
+        (Platzhalter, bis echte Bilder kommen)
+     ========================================================= */
+  const PALETTES = [
+    ['#FF5A36', '#FFC93C', '#1E3A8A', '#F7F3EA'], ['#0FA3B1', '#F7B32B', '#F2545B', '#191923'],
+    ['#7B2CBF', '#FF6D00', '#FFD6A5', '#240046'], ['#06D6A0', '#118AB2', '#FFD166', '#073B4C'],
+    ['#E63946', '#F1FAEE', '#457B9D', '#1D3557'], ['#FF70A6', '#FF9770', '#FFD670', '#70D6FF'],
+    ['#3A86FF', '#FFBE0B', '#FB5607', '#FF006E'], ['#5F0F40', '#FB8B24', '#E36414', '#0F4C5C'],
+    ['#22577A', '#38A3A5', '#80ED99', '#C7F9CC'], ['#F72585', '#4CC9F0', '#3A0CA3', '#FFFFFF'],
+    ['#264653', '#2A9D8F', '#E9C46A', '#F4A261'], ['#111111', '#FF4F00', '#F2F0E6', '#3D5AFE']
+  ];
+  function rng(seed) {
+    let s = 2166136261;
+    for (const ch of seed) s = Math.imul(s ^ ch.charCodeAt(0), 16777619) >>> 0;
+    return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; };
+  }
+  function paintCover(ctx, key, S) {
+    const r = rng(key + 'chemnitz');
+    const p = PALETTES[Math.floor(r() * PALETTES.length)].slice();
+    for (let i = p.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [p[i], p[j]] = [p[j], p[i]]; }
+    const [a, b, c, d] = p;
+    const circle = (x, y, rad, col) => { ctx.fillStyle = col; ctx.beginPath(); ctx.arc(x, y, rad, 0, Math.PI * 2); ctx.fill(); };
+    ctx.fillStyle = a; ctx.fillRect(0, 0, S, S);
+    const style = Math.floor(r() * 6);
+    if (style === 0) {            // Sonne mit Streifen
+      circle(S * (.35 + r() * .3), S * .52, S * .3, b);
+      ctx.fillStyle = a;
+      for (let i = 0; i < 6; i++) ctx.fillRect(0, S * (.56 + i * .065), S, S * (.012 + i * .006));
+      ctx.fillStyle = c; ctx.fillRect(0, S * .86, S, S * .14);
+    } else if (style === 1) {     // Bauhaus-Raster
+      const w = S / 2, cols = [a, b, c, d];
+      for (let gx = 0; gx < 2; gx++) for (let gy = 0; gy < 2; gy++) {
+        const x = gx * w, y = gy * w, bg = cols[Math.floor(r() * 4)];
+        let fg = cols[Math.floor(r() * 4)]; if (fg === bg) fg = cols[(cols.indexOf(bg) + 1) % 4];
+        ctx.fillStyle = bg; ctx.fillRect(x, y, w, w);
+        ctx.fillStyle = fg;
+        const k = Math.floor(r() * 3);
+        ctx.save(); ctx.beginPath(); ctx.rect(x, y, w, w); ctx.clip();
+        ctx.beginPath();
+        if (k === 0) { const cx = x + (r() < .5 ? 0 : w), cy = y + (r() < .5 ? 0 : w); ctx.arc(cx, cy, w, 0, Math.PI * 2); }
+        else if (k === 1) ctx.arc(x + w / 2, y + w / 2, w * .36, 0, Math.PI * 2);
+        else ctx.arc(x + w / 2, y + w, w / 2, Math.PI, 0);
+        ctx.fill(); ctx.restore();
+      }
+    } else if (style === 2) {     // Diagonale Streifen + Kreis
+      ctx.save(); ctx.translate(S / 2, S / 2); ctx.rotate(Math.PI / 4 * (r() < .5 ? 1 : -1));
+      ctx.fillStyle = b; const sw = S * .075;
+      for (let x = -S; x < S; x += sw * 2) ctx.fillRect(x, -S, sw, S * 2);
+      ctx.restore();
+      circle(S * (.3 + r() * .4), S * (.3 + r() * .4), S * .26, c);
+      circle(S * (.3 + r() * .4), S * (.3 + r() * .4), S * .1, d);
+    } else if (style === 3) {     // Ringe aus einer Ecke
+      const cx = r() < .5 ? 0 : S, cy = r() < .5 ? 0 : S, cols = [b, c, d, a];
+      for (let i = 0; i < 12; i++) circle(cx, cy, S * (1.45 - i * .12), cols[i % 4]);
+    } else if (style === 4) {     // Punkteraster
+      const n = 4 + Math.floor(r() * 3), cw = S / n, cols = [b, c, d];
+      for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) circle(cw * (i + .5), cw * (j + .5), cw * (.18 + r() * .3), cols[Math.floor(r() * 3)]);
+    } else {                      // Wellen
+      const cols = [b, c, d];
+      for (let i = 0; i < 7; i++) {
+        const y0 = S * (.12 + i * .13), amp = S * (.03 + r() * .05), ph = r() * 6;
+        ctx.fillStyle = cols[i % 3]; ctx.beginPath(); ctx.moveTo(0, S);
+        for (let x = 0; x <= S; x += S / 40) ctx.lineTo(x, y0 + Math.sin(x / S * Math.PI * 2 + ph) * amp);
+        ctx.lineTo(S, S); ctx.closePath(); ctx.fill();
+      }
+    }
+    // feines Korn, damit es weniger digital wirkt
+    const img = ctx.getImageData(0, 0, S, S), px = img.data;
+    for (let i = 0; i < px.length; i += 4) { const n = (r() - .5) * 18; px[i] += n; px[i + 1] += n; px[i + 2] += n; }
+    ctx.putImageData(img, 0, 0);
+  }
+  const coverCache = {};
+  function cover(key) {
+    if (coverCache[key]) return coverCache[key];
+    const S = 560, cv = document.createElement('canvas'); cv.width = cv.height = S;
+    paintCover(cv.getContext('2d'), key, S);
+    return (coverCache[key] = cv.toDataURL('image/jpeg', .86));
+  }
+
+  /* =========================================================
+     5. Bausteine: Herz, Karten, Zeilen
+     ========================================================= */
+  const heartBtn = (ev, onCover) => {
+    const on = isFav(ev.id), ico = on ? I.heartFill : I.heart;
+    return `<button class="heart" data-fav="${ev.id}" aria-pressed="${on}" aria-label="${on ? 'Von Merkliste entfernen' : 'Merken'}">${onCover ? `<span>${ico}</span>` : ico}</button>`;
+  };
+  function card(ev, size) {
+    const regular = ev.rhythm === 'regelmaessig';
+    const dateLine = regular ? `${esc(ev.rhythmText)} · ${ev.time}` : `${shortDate(ev)} · ${ev.time}`;
+    return `<article class="card ${size || ''}" data-id="${ev.id}" tabindex="0" aria-label="${esc(ev.title)}">
+      <div class="cv"><img src="${cover(ev.cover)}" alt="" loading="lazy">
+        ${regular ? '' : `<span class="pill">${RHYTHM[ev.rhythm].label}</span>`}${heartBtn(ev, true)}</div>
+      <div class="c-date">${dateLine}</div>
+      <h3>${esc(ev.title)}</h3>
+      <div class="c-place">${esc(ev.place)}</div>
+      ${size === 'sm' ? '' : `<div class="c-price">${esc(ev.price)}</div>`}
+    </article>`;
+  }
+  function row(ev) {
+    return `<div class="row" data-id="${ev.id}" tabindex="0" role="button" aria-label="${esc(ev.title)}, ${ev.time} Uhr">
+      <div class="time">${ev.time}<small>bis ${ev.end}</small></div>
+      <img class="thumb" src="${cover(ev.cover)}" alt="" loading="lazy">
+      <div class="main"><div class="ti">${esc(ev.title)}</div>
+        <div class="su"><span class="tag tag-${ev.rhythm}">${RHYTHM[ev.rhythm].label}</span><span class="pl">${esc(ev.place)}</span></div></div>
+      <div class="cat">${catName(ev.cat)}</div>
+      ${heartBtn(ev)}
+    </div>`;
+  }
+
+  /* =========================================================
+     6. Seite aufbauen
+     ========================================================= */
+  document.getElementById('today').textContent = fmtLong(TODAY);
+  document.querySelectorAll('[data-dir="-1"]').forEach(b => b.innerHTML = I.left);
+  document.querySelectorAll('[data-dir="1"]').forEach(b => b.innerHTML = I.right);
+
+  function renderFilters() {
+    const all = active.size === CATEGORIES.length;
+    document.getElementById('filters').innerHTML =
+      `<button class="flt all" data-cat="" aria-pressed="${all}">Alle</button>` +
+      CATEGORIES.map(c => `<button class="flt" data-cat="${c.id}" aria-pressed="${active.has(c.id)}">${esc(c.name)}</button>`).join('');
+    const top = topInterests();
+    document.getElementById('learn').innerHTML = top.length
+      ? `${I.spark}<span>Für dich weiter oben: <strong>${top.join(', ')}</strong></span><button id="resetLearn">Zurücksetzen</button>`
+      : `${I.spark}<span>Die Seite merkt sich, was dich interessiert, und sortiert passend.</span>`;
+  }
+
+  function renderHero() {
+    const max = period === 'woche' ? LIST_DAYS - 1 : 30;
+    const list = rank(EVENTS.filter(e => e.rhythm !== 'regelmaessig' && e.day <= max && shown(e)));
+    const rail = document.getElementById('heroRail');
+    rail.innerHTML = list.length ? list.map(e => card(e)).join('') : `<p class="empty">Keine besonderen Termine in den gewählten Kategorien.</p>`;
+    rail.scrollLeft = 0;
+    updateCounter();
+  }
+  function updateCounter() {
+    const rail = document.getElementById('heroRail'), n = rail.querySelectorAll('.card').length;
+    const first = rail.querySelector('.card');
+    if (!first) { document.getElementById('heroCount').textContent = ''; return; }
+    const step = first.offsetWidth + 12;
+    const i = Math.min(n, Math.round(rail.scrollLeft / step) + 1);
+    document.getElementById('heroCount').textContent = `${i} / ${n}`;
+  }
+
+  function renderDays() {
+    let html = '';
+    for (let n = 0; n < LIST_DAYS; n++) {
+      const d = dayDate(n), cnt = EVENTS.filter(e => e.day === n && shown(e));
+      const special = cnt.some(e => e.rhythm !== 'regelmaessig');
+      html += `<button class="dbtn" data-day="${n}" ${cnt.length ? '' : 'disabled'} aria-label="${relDay(n)}, ${d.getDate()}. ${MO[d.getMonth()]}">
+        <small>${n === 0 ? 'Heute' : n === 1 ? 'Morgen' : WD[d.getDay()].slice(0, 2)}</small><b>${d.getDate()}</b>${special ? '<span class="dot" title="Besonderes an diesem Tag"></span>' : ''}</button>`;
+    }
+    document.getElementById('days').innerHTML = html;
+    spy();
+  }
+
+  function renderList() {
+    let html = '';
+    for (let n = 0; n < LIST_DAYS; n++) {
+      const d = dayDate(n);
+      const all = EVENTS.filter(e => e.day === n && shown(e));
+      const hl = rank(all.filter(e => e.rhythm !== 'regelmaessig'));
+      html += `<section class="day" id="tag-${n}" data-day="${n}">
+        <div class="day-h"><h2>${relDay(n)}</h2><span class="d">${n < 2 ? WD[d.getDay()] + ', ' : ''}${d.getDate()}. ${MO[d.getMonth()]}</span><span class="n">${all.length} ${all.length === 1 ? 'Termin' : 'Termine'}</span></div>
+        ${hl.length ? `<div class="lbl">${I.star}Highlights ${n === 0 ? 'heute' : n === 1 ? 'morgen' : 'am ' + WD[d.getDay()]}</div><div class="rail">${hl.map(e => card(e, 'sm')).join('')}</div>` : ''}
+        ${all.length ? `<div class="table">${byTime(all).map(row).join('')}</div>` : `<p class="empty">Keine Termine in den gewählten Kategorien.</p>`}
+      </section>`;
+    }
+    document.getElementById('list').innerHTML = html;
+  }
+
+  function renderRegular() {
+    const seen = new Set(), list = [];
+    EVENTS.filter(e => e.rhythm === 'regelmaessig' && shown(e)).sort((a, b) => a.day - b.day || a.time.localeCompare(b.time))
+      .forEach(e => { if (!seen.has(e.series)) { seen.add(e.series); list.push(e); } });
+    list.sort((a, b) => affinity(b.cat) - affinity(a.cat) || a.day - b.day);
+    document.getElementById('regRail').innerHTML = list.length ? list.map(e => card(e, 'md')).join('') : `<p class="empty">Keine regelmäßigen Termine in den gewählten Kategorien.</p>`;
+  }
+
+  function renderFavBtn() {
+    const n = favs.length;
+    document.getElementById('favBtn').innerHTML = `${n ? I.heartFill : I.heart}Merkliste${n ? ` <span class="n">${n}</span>` : ''}`;
+  }
+
+  function renderAll() { renderFilters(); renderHero(); renderDays(); renderList(); renderRegular(); renderFavBtn(); }
+
+  // Herz umschalten, ohne die Seite neu aufzubauen (Karussells bleiben an ihrer Stelle)
+  function syncHearts(id) {
+    const on = isFav(id);
+    document.querySelectorAll(`[data-fav="${id}"]`).forEach(b => {
+      b.setAttribute('aria-pressed', on);
+      b.setAttribute('aria-label', on ? 'Von Merkliste entfernen' : 'Merken');
+      const inner = b.querySelector('span');
+      (inner || b).innerHTML = on ? I.heartFill : I.heart;
+    });
+    renderFavBtn();
+    if (on) { const f = document.getElementById('favBtn'); f.classList.remove('bump'); void f.offsetWidth; f.classList.add('bump'); }
+  }
+
+  /* =========================================================
+     7. Bedienung
+     ========================================================= */
+  document.getElementById('filters').addEventListener('click', e => {
+    const b = e.target.closest('.flt'); if (!b) return;
+    const id = b.dataset.cat;
+    if (!id) active = new Set(CATEGORIES.map(c => c.id));
+    else if (active.has(id)) active.delete(id);
+    else { active.add(id); track(id, 1); }
+    renderAll();
+  });
+  document.getElementById('period').addEventListener('click', e => {
+    const b = e.target.closest('[data-p]'); if (!b) return;
+    period = b.dataset.p;
+    document.querySelectorAll('#period button').forEach(x => x.setAttribute('aria-pressed', x === b));
+    renderHero();
+  });
+
+  document.addEventListener('click', e => {
+    if (e.target.closest('.backdrop')) return;
+    const f = e.target.closest('[data-fav]');
+    if (f) { e.stopPropagation(); toggleFav(f.dataset.fav); return; }
+    const s = e.target.closest('[data-scroll]');
+    if (s) { const r = document.getElementById(s.dataset.scroll); pauseAuto(r); r.scrollBy({ left: s.dataset.dir * r.clientWidth * .8, behavior: 'smooth' }); return; }
+    if (e.target.id === 'resetLearn') { interest = {}; save('wilc4-interessen', interest); renderAll(); return; }
+    const day = e.target.closest('.dbtn');
+    if (day) { jumpTo(+day.dataset.day); return; }
+    const item = e.target.closest('[data-id]');
+    if (item) openDetail(byId(item.dataset.id));
+  });
+  document.addEventListener('keydown', e => {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('[data-id]')) { e.preventDefault(); e.target.click(); }
+  });
+  document.getElementById('favBtn').addEventListener('click', openFavorites);
+  document.getElementById('brand').addEventListener('click', e => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+  // Tagesleiste: springen + aktuellen Tag markieren
+  function stickyOffset() {
+    const bar = document.querySelector('.bar').getBoundingClientRect().bottom;
+    return bar + document.querySelector('.days').offsetHeight;
+  }
+  function jumpTo(n) {
+    const sec = document.getElementById('tag-' + n); if (!sec) return;
+    const y = sec.getBoundingClientRect().top + window.scrollY - stickyOffset() + 1;
+    window.scrollTo({ top: y, behavior: reduced ? 'auto' : 'smooth' });
+    markDay(n);
+  }
+  let current = -1;
+  function markDay(n) {
+    if (n === current) return;
+    current = n;
+    const strip = document.getElementById('days');
+    strip.querySelectorAll('.dbtn').forEach(b => b.setAttribute('aria-current', +b.dataset.day === n));
+    const btn = strip.querySelector(`[data-day="${n}"]`);
+    if (btn) {
+      const left = btn.offsetLeft - strip.clientWidth / 2 + btn.offsetWidth / 2;
+      strip.scrollTo({ left, behavior: reduced ? 'auto' : 'smooth' });
+    }
+  }
+  function spy() {
+    const off = stickyOffset() + 8;
+    let n = 0;
+    document.querySelectorAll('.day').forEach(s => { if (s.getBoundingClientRect().top <= off) n = +s.dataset.day; });
+    current = -1; markDay(n);
+  }
+  let spyRaf = 0;
+  window.addEventListener('scroll', () => { cancelAnimationFrame(spyRaf); spyRaf = requestAnimationFrame(() => {
+    const off = stickyOffset() + 8; let n = 0;
+    document.querySelectorAll('.day').forEach(s => { if (s.getBoundingClientRect().top <= off) n = +s.dataset.day; });
+    markDay(n);
+  }); }, { passive: true });
+
+  // Großes Karussell läuft automatisch weiter (pausiert beim Anfassen)
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const heroRail = document.getElementById('heroRail');
+  let pausedUntil = 0;
+  function pauseAuto(rail) { if (rail === heroRail) pausedUntil = Date.now() + 8000; }
+  ['pointerdown', 'touchstart', 'wheel', 'focusin'].forEach(t => heroRail.addEventListener(t, () => pauseAuto(heroRail), { passive: true }));
+  heroRail.addEventListener('mouseenter', () => pausedUntil = Infinity);
+  heroRail.addEventListener('mouseleave', () => pausedUntil = Date.now() + 2000);
+  heroRail.addEventListener('scroll', () => requestAnimationFrame(updateCounter), { passive: true });
+  if (!reduced) setInterval(() => {
+    if (Date.now() < pausedUntil || document.hidden || document.querySelector('.backdrop')) return;
+    const first = heroRail.querySelector('.card'); if (!first) return;
+    const step = first.offsetWidth + 12, max = heroRail.scrollWidth - heroRail.clientWidth;
+    const next = heroRail.scrollLeft + step > max + 2 ? 0 : heroRail.scrollLeft + step;
+    heroRail.scrollTo({ left: next, behavior: 'smooth' });
+  }, 4500);
+
+  /* =========================================================
+     8. Fenster: Details, Merkliste, Teilen
+     ========================================================= */
+  function openSheet(html, cls) {
+    const back = document.createElement('div');
+    back.className = 'backdrop ' + (cls || '');
+    back.innerHTML = `<div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div>${html}</div>`;
+    const close = () => { back.remove(); document.removeEventListener('keydown', onKey); document.body.style.overflow = ''; };
+    const onKey = e => { if (e.key === 'Escape') close(); };
+    back.addEventListener('click', e => { if (e.target === back || e.target.closest('[data-close]')) close(); });
+    document.addEventListener('keydown', onKey);
+    document.body.appendChild(back);
+    document.body.style.overflow = 'hidden';
+    const c = back.querySelector('[data-close]'); if (c) c.focus({ preventScroll: true });
+    return { el: back, sheet: back.querySelector('.sheet'), close };
+  }
+
+  function openDetail(ev) {
+    if (!ev) return;
+    track(ev.cat, 1);
+    const favLabel = () => isFav(ev.id) ? I.heartFill + 'Gemerkt' : I.heart + 'Merken';
+    const s = openSheet(`
+      <div class="d-cover"><img src="${cover(ev.cover)}" alt=""><button class="x" data-close aria-label="Schließen">${I.close}</button></div>
+      <div class="d-meta"><span class="tag tag-${ev.rhythm}">${RHYTHM[ev.rhythm].label}</span>${catName(ev.cat)}</div>
+      <h2>${esc(ev.title)}</h2>
+      <ul class="facts">
+        <li>${I.cal}<span>${fmtLong(ev.date)}<small>${relDay(ev.day)}</small></span></li>
+        <li>${I.clock}<span>${ev.time} – ${ev.end} Uhr</span></li>
+        <li>${I.pin}<span>${esc(ev.place)}<small>${esc(ev.district)}</small></span></li>
+        <li>${I.ticket}<span>${esc(ev.price)}</span></li>
+        <li>${I.repeat}<span>${esc(ev.rhythmText)}</span></li>
+      </ul>
+      <p class="desc">${esc(ev.desc)}</p>
+      <div class="actions">
+        <button class="btn" data-dfav aria-pressed="${isFav(ev.id)}">${favLabel()}</button>
+        <button class="btn primary" data-dshare>${I.share}Als Story teilen</button>
+      </div>
+      <p class="note">Beispielveranstaltung, erfundene Daten</p>`);
+    s.sheet.addEventListener('click', e => {
+      const b = e.target.closest('[data-dfav]');
+      if (b) { toggleFav(ev.id); b.setAttribute('aria-pressed', isFav(ev.id)); b.innerHTML = favLabel(); }
+      if (e.target.closest('[data-dshare]')) { s.close(); openShare(ev); }
+    });
+  }
+
+  function openFavorites() {
+    const body = () => {
+      const list = favs.map(byId).filter(Boolean).sort((a, b) => a.day - b.day || a.time.localeCompare(b.time));
+      return `<div class="sheet-top"><strong>Merkliste</strong><button class="x" data-close aria-label="Schließen">${I.close}</button></div>
+        ${list.length ? `<ul class="favlist">${list.map(e => `<li><img src="${cover(e.cover)}" alt="">
+          <button class="open" data-open="${e.id}"><b>${esc(e.title)}</b><span>${shortDate(e)}, ${e.time} Uhr · ${esc(e.place)}</span></button>
+          <button class="heart" data-unfav="${e.id}" aria-pressed="true" aria-label="Von Merkliste entfernen">${I.heartFill}</button></li>`).join('')}</ul>
+          <p class="note">Nur auf diesem Gerät gespeichert, ohne Konto.</p>`
+        : `<p class="fav-empty">Noch nichts gemerkt.<br>Tippe bei einer Veranstaltung auf das Herz.</p>`}`;
+    };
+    const s = openSheet(body());
+    s.sheet.addEventListener('click', e => {
+      const u = e.target.closest('[data-unfav]');
+      if (u) { toggleFav(u.dataset.unfav); s.sheet.innerHTML = '<div class="grab"></div>' + body(); return; }
+      const o = e.target.closest('[data-open]');
+      if (o) { s.close(); openDetail(byId(o.dataset.open)); }
+    });
+  }
+
+  /* ----- Story-Bild 1080 × 1920 ----- */
+  function wrap(ctx, text, maxW) {
+    const words = text.split(' '), lines = []; let line = '';
+    words.forEach(w => { const t = line ? line + ' ' + w : w; if (ctx.measureText(t).width > maxW && line) { lines.push(line); line = w; } else line = t; });
+    if (line) lines.push(line); return lines;
+  }
+  function drawStory(ev) {
+    const W = 1080, H = 1920, P = 100;
+    const c = document.createElement('canvas'); c.width = W; c.height = H;
+    const x = c.getContext('2d');
+    const F = '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif';
+    x.fillStyle = '#0B0B0C'; x.fillRect(0, 0, W, H);
+
+    // Cover groß oben (Instagram lässt oben ~250 px frei)
+    const S = W - P * 2, top = 270;
+    const art = document.createElement('canvas'); art.width = art.height = S;
+    paintCover(art.getContext('2d'), ev.cover, S);
+    x.save(); x.beginPath();
+    if (x.roundRect) x.roundRect(P, top, S, S, 36); else x.rect(P, top, S, S);
+    x.clip(); x.drawImage(art, P, top); x.restore();
+
+    let y = top + S + 90;
+    // Merkmal
+    x.font = `700 32px ${F}`;
+    const label = `${RHYTHM[ev.rhythm].label.toUpperCase()}  ·  ${catName(ev.cat).toUpperCase()}`;
+    if ('letterSpacing' in x) x.letterSpacing = '3px';
+    x.fillStyle = ev.rhythm === 'regelmaessig' ? 'rgba(255,255,255,.6)' : '#FFFFFF';
+    x.fillText(label, P, y);
+    if ('letterSpacing' in x) x.letterSpacing = '0px';
+
+    // Titel (max. 3 Zeilen)
+    let size = 84, lines;
+    do { x.font = `800 ${size}px ${F}`; lines = wrap(x, ev.title, W - P * 2); size -= 4; } while (lines.length > 3 && size > 52);
+    size += 4; x.font = `800 ${size}px ${F}`; x.fillStyle = '#FFFFFF';
+    y += 30;
+    lines.slice(0, 3).forEach((l, i) => x.fillText(l, P, y + size + i * size * 1.06));
+    y += size + (Math.min(lines.length, 3) - 1) * size * 1.06 + 64;
+
+    // Datum, Zeit, Ort
+    x.font = `700 46px ${F}`; x.fillStyle = '#FFFFFF';
+    x.fillText(`${fmtLong(ev.date)} · ${ev.time} Uhr`, P, y);
+    x.font = `500 40px ${F}`; x.fillStyle = 'rgba(255,255,255,.72)';
+    x.fillText(wrap(x, `${ev.place}, ${ev.district}`, W - P * 2)[0], P, y + 58);
+
+    x.font = `700 30px ${F}`; x.fillStyle = 'rgba(255,255,255,.5)';
+    if ('letterSpacing' in x) x.letterSpacing = '4px';
+    x.fillText('WAS IST LOS IN CHEMNITZ', P, H - 300);
+    return c;
+  }
+  function openShare(ev) {
+    const canvas = drawStory(ev);
+    const url = canvas.toDataURL('image/png');
+    let file = null;
+    try {
+      const bin = atob(url.split(',')[1]), arr = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+      file = new File([arr], 'chemnitz-story.png', { type: 'image/png' });
+    } catch (_) {}
+    const canShare = !!(file && navigator.canShare && navigator.canShare({ files: [file] }));
+    const s = openSheet(`
+      <div class="sheet-top"><strong>Story-Bild</strong><button class="x" data-close aria-label="Schließen">${I.close}</button></div>
+      <img class="share-img" src="${url}" alt="Story-Bild: ${esc(ev.title)}, ${fmtLong(ev.date)}, ${esc(ev.place)}">
+      <p class="share-hint" data-hint>${canShare
+        ? 'Tippe auf „Teilen…“ und wähle Instagram. Dort „Story“ auswählen.'
+        : 'Bild gedrückt halten und „Teilen…“ oder „Zu Fotos hinzufügen“ wählen. Am Computer: Rechtsklick, „Bild speichern“.'}</p>
+      <div class="actions">${canShare ? `<button class="btn primary" data-go>${I.share}Teilen…</button>` : ''}<button class="btn" data-close>Fertig</button></div>`, 'share');
+    const go = s.el.querySelector('[data-go]');
+    if (go) go.addEventListener('click', () => {
+      navigator.share({ files: [file], title: ev.title }).catch(err => {
+        if (err && err.name === 'AbortError') return;
+        s.el.querySelector('[data-hint]').textContent = 'Teilen war nicht möglich. Halte das Bild gedrückt und wähle „Teilen…“.';
+        go.remove();
+      });
+    });
+  }
+
+  renderAll();
+})();
+</script>
+</body>
+</html>
