@@ -305,7 +305,7 @@ footer a { color: var(--fg); }
   //   webp:  animiertes WebP, ca. 480 × 600 Pixel, möglichst unter 400 KB
   // Reihenfolge: Video, sonst animiertes Bild, sonst normales Bild mit sanftem Zoom.
   // Beispiel: a03: { video: 'medien/orgelnacht.mp4', webp: 'medien/orgelnacht.webp' }
-  const MEDIA = {};
+  const MEDIA = { a13: { video: 'medien/konzert.mp4' } };   // Clubnacht: erstes echtes Test-Video (480 × 640, 4 s, 140 KB)
 
   // Besondere Termine: [id, Tage ab heute, Beginn, Ende, Kategorie, Merkmal, Rhythmus-Text, Titel, Ort, Stadtteil, Preis, Beschreibung]
   const SPECIAL = [
@@ -633,7 +633,8 @@ footer a { color: var(--fg); }
   }
 
   function renderHero() {
-    const list = rank(items.filter(e => e.rhythm !== 'regelmaessig')).slice(0, 30);
+    const list = rank(items.filter(e => e.rhythm !== 'regelmaessig')).slice(0, 30)
+      .sort((a, b) => !!b.video - !!a.video);   // Karten mit Video zuerst
     heroRail.innerHTML = list.length ? list.map(e => card(e, 'lg')).join('') : `<p class="empty">Keine besonderen Termine in den gewählten Kategorien.</p>`;
     heroRail.scrollLeft = 0;
     live.disconnect();
