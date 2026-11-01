@@ -59,8 +59,7 @@ img { max-width: 100%; display: block; }
 @keyframes bump { 50% { transform: scale(1.08); } }
 
 /* ---------- Einleitung + Filter ---------- */
-.intro { padding-block: 14px 0; }
-.today { font-size: 12.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--fg2); margin: 0; }
+.intro { padding-block: 4px 0; }
 .filters { display: flex; gap: 2px 20px; overflow-x: auto; scrollbar-width: none; margin: 6px calc(-1 * max(16px, env(safe-area-inset-left, 0px))) 0; padding: 0 max(16px, env(safe-area-inset-left, 0px)); border-bottom: 1px solid var(--line); }
 .filters::-webkit-scrollbar { display: none; }
 .flt { appearance: none; border: 0; background: none; padding: 12px 0 11px; min-height: 44px; font-size: 15.5px; font-weight: 600; color: var(--fg3); white-space: nowrap; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; flex: none; }
@@ -88,9 +87,10 @@ img { max-width: 100%; display: block; }
   scroll-padding-inline: max(16px, env(safe-area-inset-left, 0px)); }
 .rail::-webkit-scrollbar { display: none; }
 @media (min-width: 1152px) { .rail { margin-inline: 0; padding-inline: 0; scroll-padding-inline: 0; } }
-#regRail { scroll-snap-type: x mandatory; }
+#heroRail { scroll-snap-type: x mandatory; }
+.track { display: flex; flex: none; gap: inherit; will-change: transform; }
 
-.card { flex: none; width: 150px; scroll-snap-align: start; cursor: pointer; min-width: 0; }
+.card { flex: none; width: 132px; scroll-snap-align: start; cursor: pointer; min-width: 0; }
 .card .cv { position: relative; aspect-ratio: 4 / 5; border-radius: 10px; overflow: hidden; background: var(--surface); max-width: 100%; }
 .card .cv img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; }
 .card:hover .cv img { transform: scale(1.03); }
@@ -109,8 +109,7 @@ img { max-width: 100%; display: block; }
 .card.sm h3 { font-size: 12.5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .card.sm .c-place { font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* Merkmal und Herz auf dem Cover */
-.pill { position: absolute; left: 6px; top: 6px; font-size: 9px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #fff; background: rgba(0,0,0,.5); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: 4px 6px; border-radius: 5px; line-height: 1; }
+/* Herz auf dem Cover */
 .heart { appearance: none; border: 0; background: none; width: 44px; height: 44px; display: grid; place-items: center; cursor: pointer; color: var(--fg2); flex: none; border-radius: 50%; -webkit-tap-highlight-color: transparent; }
 .heart[aria-pressed="true"] { color: var(--heart); }
 .heart:active .ico { transform: scale(.85); }
@@ -143,18 +142,14 @@ img { max-width: 100%; display: block; }
 .day-h .n { margin-left: auto; color: var(--fg2); font-size: 13px; }
 .day .rail { margin-top: 12px; }
 .table { margin-top: 14px; border-top: 1px solid var(--line); }
-.row { display: grid; grid-template-columns: 50px 52px minmax(0, 1fr) 44px; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); cursor: pointer; min-height: 72px; }
+.row { display: grid; grid-template-columns: 60px 52px minmax(0, 1fr) 44px; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); cursor: pointer; min-height: 72px; }
 .row:hover { background: linear-gradient(90deg, transparent, var(--surface) 8%, var(--surface) 92%, transparent); }
 .row .time { font-variant-numeric: tabular-nums; font-weight: 700; font-size: 15.5px; line-height: 1.2; }
-.row .time small { display: block; font-weight: 500; font-size: 12.5px; color: var(--fg2); }
+.row .time small { display: block; font-weight: 500; font-size: 12.5px; color: var(--fg2); white-space: nowrap; }
 .row .thumb { width: 52px; height: 52px; border-radius: 8px; object-fit: cover; background: var(--surface); }
 .row .main { min-width: 0; }
 .row .ti { font-weight: 650; font-size: 15.5px; line-height: 1.25; overflow-wrap: anywhere; }
 .row .su { margin-top: 3px; font-size: 13px; color: var(--fg2); }
-.tag { font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; padding: 3px 6px; border-radius: 5px; line-height: 1.2; white-space: nowrap; }
-.tag-einmalig, .tag-selten { background: var(--fg); color: var(--bg); }
-.tag-jaehrlich { box-shadow: inset 0 0 0 1px var(--line-strong); color: var(--fg); }
-.tag-regelmaessig { color: var(--fg2); padding-left: 0; }
 .row .cat { display: none; }
 @media (min-width: 760px) {
   .row { grid-template-columns: 64px 56px minmax(0, 1fr) 150px 44px; }
@@ -187,10 +182,12 @@ footer a { color: var(--fg); }
 .facts small { display: block; color: var(--fg2); font-size: 13px; }
 .desc { font-size: 15.5px; line-height: 1.55; margin: 0 0 20px; }
 .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.btn { appearance: none; border: 1px solid var(--line-strong); background: none; border-radius: 10px; min-height: 50px; padding: 0 12px; font-size: 15.5px; font-weight: 650; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; color: var(--fg); }
+.btn { appearance: none; border: 1px solid var(--line-strong); background: none; border-radius: 10px; min-height: 50px; padding: 6px 12px; font-size: 15.5px; font-weight: 650; line-height: 1.2; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; color: var(--fg); }
+.btn.wide { grid-column: 1 / -1; }
 .btn.primary { background: var(--fg); color: var(--bg); border-color: var(--fg); }
 .btn[aria-pressed="true"] { color: var(--heart); border-color: var(--heart); }
 .note { font-size: 12px; color: var(--fg2); text-align: center; margin: 14px 0 0; }
+.note a { color: var(--fg); }
 .favlist { list-style: none; margin: 10px 0 0; padding: 0; }
 .favlist li { display: grid; grid-template-columns: 52px minmax(0, 1fr) 44px; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
 .favlist img { width: 52px; height: 52px; border-radius: 8px; object-fit: cover; }
@@ -218,7 +215,6 @@ footer a { color: var(--fg); }
 
 <main>
   <div class="wrap intro">
-    <p class="today" id="today"></p>
     <nav class="filters" id="filters" aria-label="Kategorien"></nav>
   </div>
 
@@ -242,7 +238,7 @@ footer a { color: var(--fg); }
   <!-- 4. Karussell: Regelmäßiges -->
   <section class="wrap sec" aria-labelledby="regTitle" style="margin-top:44px">
     <div class="sec-head">
-      <div><h2 id="regTitle">Immer wieder</h2><p>Regelmäßig jede Woche oder jeden Monat</p></div>
+      <div><h2 id="regTitle">Immer wieder</h2><p>Jede Woche oder jeden Monat</p></div>
       <div class="arrows"><button class="arrow" data-scroll="regRail" data-dir="-1" aria-label="Zurück"></button><button class="arrow" data-scroll="regRail" data-dir="1" aria-label="Weiter"></button></div>
     </div>
     <div class="rail" id="regRail"></div>
@@ -268,12 +264,9 @@ footer a { color: var(--fg); }
     { id: 'sport',    name: 'Sport' },
     { id: 'essen',    name: 'Essen & Trinken' }
   ];
-  const RHYTHM = {
-    einmalig:     { label: 'Einmalig',        weight: 300 },
-    selten:       { label: 'Alle paar Jahre', weight: 260 },
-    jaehrlich:    { label: 'Jährlich',        weight: 160 },
-    regelmaessig: { label: 'Regelmäßig',      weight: 0 }
-  };
+  // Merkmal (intern, wird nicht angezeigt): je seltener, desto weiter oben
+  const WEIGHT = { einmalig: 300, selten: 260, jaehrlich: 160, regelmaessig: 0 };
+  const LINK = 'https://example.com/veranstaltung/'; // Platzhalter, echte Veranstalter-Links kommen mit den echten Daten
   const LIST_DAYS = 7; // Tagesleiste: heute + 6 Tage
 
   // Besondere Termine: [id, Tage ab heute, Beginn, Ende, Kategorie, Merkmal, Rhythmus-Text, Titel, Ort, Stadtteil, Preis, Beschreibung]
@@ -316,11 +309,11 @@ footer a { color: var(--fg); }
   const dayDate = n => { const d = new Date(TODAY); d.setDate(d.getDate() + n); return d; };
 
   const EVENTS = [];
-  SPECIAL.forEach(a => EVENTS.push({ id: a[0], day: a[1], time: a[2], end: a[3], cat: a[4], rhythm: a[5], rhythmText: a[6], title: a[7], place: a[8], district: a[9], price: a[10], desc: a[11], cover: a[0], date: dayDate(a[1]) }));
+  SPECIAL.forEach(a => EVENTS.push({ id: a[0], day: a[1], time: a[2], end: a[3], cat: a[4], rhythm: a[5], rhythmText: a[6], title: a[7], place: a[8], district: a[9], price: a[10], desc: a[11], url: LINK + a[0], cover: a[0], date: dayDate(a[1]) }));
   for (let n = 0; n < LIST_DAYS; n++) {
     const d = dayDate(n);
     SERIES.forEach(s => {
-      if (s.wd.includes(d.getDay())) EVENTS.push(Object.assign({}, s, { id: `${s.id}-${n}`, series: s.id, day: n, date: d, rhythm: 'regelmaessig', rhythmText: s.freq, cover: s.id }));
+      if (s.wd.includes(d.getDay())) EVENTS.push(Object.assign({}, s, { id: `${s.id}-${n}`, series: s.id, day: n, date: d, rhythm: 'regelmaessig', rhythmText: s.freq, url: LINK + s.id, cover: s.id }));
     });
   }
   const byId = id => EVENTS.find(e => e.id === id);
@@ -350,7 +343,7 @@ footer a { color: var(--fg); }
   const topInterests = () => Object.entries(interest).filter(([, v]) => v >= 2).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([id]) => catName(id));
 
   // Sortierung: Seltenheit zuerst, dann Interesse, dann Nähe
-  const score = e => RHYTHM[e.rhythm].weight + affinity(e.cat) * 70 - e.day * 4;
+  const score = e => WEIGHT[e.rhythm] + affinity(e.cat) * 70 - e.day * 4;
   const rank = list => list.slice().sort((a, b) => score(b) - score(a) || a.day - b.day || a.time.localeCompare(b.time));
   const byTime = list => list.slice().sort((a, b) => a.time.localeCompare(b.time));
   const shown = e => active.has(e.cat);
@@ -363,6 +356,8 @@ footer a { color: var(--fg); }
   const fmtLong = d => `${WD[d.getDay()]}, ${d.getDate()}. ${MO[d.getMonth()]}`;
   const relDay = n => n === 0 ? 'Heute' : n === 1 ? 'Morgen' : WD[dayDate(n).getDay()];
   const shortDate = e => e.day === 0 ? 'Heute' : e.day === 1 ? 'Morgen' : `${WD[e.date.getDay()].slice(0, 2)}, ${e.date.getDate()}. ${MO[e.date.getMonth()].slice(0, 3)}`;
+  const hm = t => t.endsWith(':00') ? String(+t.slice(0, 2)) : t.replace(/^0/, '');
+  const span = e => `${hm(e.time)}–${hm(e.end)} Uhr`;
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
   const svg = (p, fill) => `<svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="${fill ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
@@ -375,7 +370,8 @@ footer a { color: var(--fg); }
     clock: svg('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>'),
     pin: svg('<path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/>'),
     ticket: svg('<path d="M4 7.5A1.5 1.5 0 0 1 5.5 6h13A1.5 1.5 0 0 1 20 7.5V10a2 2 0 0 0 0 4v2.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 16.5V14a2 2 0 0 0 0-4z"/>'),
-    repeat: svg('<path d="M17 2.5 20.5 6 17 9.5"/><path d="M3.5 11.5V10a4 4 0 0 1 4-4h13"/><path d="M7 21.5 3.5 18 7 14.5"/><path d="M20.5 12.5V14a4 4 0 0 1-4 4h-13"/>'),
+    chat: svg('<path d="M4 20l1.3-3.9A8 8 0 1 1 8 19z"/>'),
+    out: svg('<path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>'),
     spark: svg('<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6.3 6.3l2.5 2.5M15.2 15.2l2.5 2.5M6.3 17.7l2.5-2.5M15.2 8.8l2.5-2.5"/>'),
     left: svg('<path d="m15 6-6 6 6 6"/>'), right: svg('<path d="m9 6 6 6-6 6"/>')
   };
@@ -468,11 +464,10 @@ footer a { color: var(--fg); }
     return `<button class="heart" data-fav="${ev.id}" aria-pressed="${on}" aria-label="${on ? 'Von Merkliste entfernen' : 'Merken'}">${onCover ? `<span>${ico}</span>` : ico}</button>`;
   };
   function card(ev, size) {
-    const regular = ev.rhythm === 'regelmaessig';
-    const dateLine = regular ? `${esc(ev.rhythmText)} · ${ev.time}` : `${shortDate(ev)} · ${ev.time}`;
+    const dateLine = `${ev.rhythm === 'regelmaessig' ? esc(ev.rhythmText) : shortDate(ev)} · ${hm(ev.time)} Uhr`;
     return `<article class="card ${size || ''}" data-id="${ev.id}" tabindex="0" aria-label="${esc(ev.title)}">
       <div class="cv"><img src="${cover(ev.cover)}" alt="">
-        ${regular ? '' : `<span class="pill">${RHYTHM[ev.rhythm].label}</span>`}${heartBtn(ev, true)}</div>
+        ${heartBtn(ev, true)}</div>
       <div class="c-date">${dateLine}</div>
       <h3>${esc(ev.title)}</h3>
       <div class="c-place">${esc(ev.place)}</div>
@@ -480,8 +475,8 @@ footer a { color: var(--fg); }
     </article>`;
   }
   function row(ev) {
-    return `<div class="row" data-id="${ev.id}" tabindex="0" role="button" aria-label="${esc(ev.title)}, ${ev.time} Uhr">
-      <div class="time">${ev.time}<small>bis ${ev.end}</small></div>
+    return `<div class="row" data-id="${ev.id}" tabindex="0" role="button" aria-label="${esc(ev.title)}, ${span(ev)}">
+      <div class="time">${hm(ev.time)}<small>–${hm(ev.end)} Uhr</small></div>
       <img class="thumb" src="${cover(ev.cover)}" alt="">
       <div class="main"><div class="ti">${esc(ev.title)}</div>
         <div class="su">${esc(ev.place)}</div></div>
@@ -493,7 +488,6 @@ footer a { color: var(--fg); }
   /* =========================================================
      6. Seite aufbauen
      ========================================================= */
-  document.getElementById('today').textContent = fmtLong(TODAY);
   document.querySelectorAll('[data-dir="-1"]').forEach(b => b.innerHTML = I.left);
   document.querySelectorAll('[data-dir="1"]').forEach(b => b.innerHTML = I.right);
 
@@ -519,7 +513,6 @@ footer a { color: var(--fg); }
     const list = rank(EVENTS.filter(e => e.rhythm !== 'regelmaessig' && shown(e)));
     heroRail.innerHTML = list.length ? list.map(e => card(e)).join('') : `<p class="empty">Keine besonderen Termine in den gewählten Kategorien.</p>`;
     heroRail.scrollLeft = 0;
-    autoScroll(heroRail, 30);
   }
 
   function renderDays() {
@@ -542,7 +535,7 @@ footer a { color: var(--fg); }
       const hl = dayHighlights(all);
       html += `<section class="day" id="tag-${n}" data-day="${n}">
         <div class="day-h"><h2>${relDay(n)}</h2><span class="d">${n < 2 ? WD[d.getDay()] + ', ' : ''}${d.getDate()}. ${MO[d.getMonth()]}</span><span class="n">${all.length} ${all.length === 1 ? 'Termin' : 'Termine'}</span></div>
-        ${hl.length ? `<div class="rail" aria-label="Highlights">${hl.map(e => card(e, 'sm')).join('')}</div>` : ''}
+        ${hl.length ? `<div class="rail" aria-label="Highlights"><div class="track">${hl.map(e => card(e, 'sm')).join('')}</div></div>` : ''}
         ${all.length ? `<div class="table">${byTime(all).map(row).join('')}</div>` : `<p class="empty">Keine Termine in den gewählten Kategorien.</p>`}
       </section>`;
     }
@@ -560,7 +553,9 @@ footer a { color: var(--fg); }
     EVENTS.filter(e => e.rhythm === 'regelmaessig' && shown(e)).sort((a, b) => a.day - b.day || a.time.localeCompare(b.time))
       .forEach(e => { if (!seen.has(e.series)) { seen.add(e.series); list.push(e); } });
     list.sort((a, b) => affinity(b.cat) - affinity(a.cat) || a.day - b.day);
-    document.getElementById('regRail').innerHTML = list.length ? list.map(e => card(e, 'md')).join('') : `<p class="empty">Keine regelmäßigen Termine in den gewählten Kategorien.</p>`;
+    const reg = document.getElementById('regRail');
+    reg.innerHTML = list.length ? `<div class="track">${list.map(e => card(e, 'md')).join('')}</div>` : `<p class="empty">Keine regelmäßigen Termine in den gewählten Kategorien.</p>`;
+    autoScroll(reg, 22);
   }
 
   function renderFavBtn() {
@@ -647,43 +642,64 @@ footer a { color: var(--fg); }
   let spyRaf = 0;
   window.addEventListener('scroll', () => { cancelAnimationFrame(spyRaf); spyRaf = requestAnimationFrame(() => spy()); }, { passive: true });
 
-  // Karussells laufen gleichmäßig durch. Kopien der Karten hängen hinten an,
-  // damit es ohne Sprung endlos weitergeht. Anfassen, Wischen oder Maus darüber hält kurz an.
+  // Karussells: Das obere bleibt ca. 3 Sekunden stehen und schwenkt dann zur nächsten Karte.
+  // Die unteren gleiten gleichmäßig: ganze Pixel über die Scroll-Position, Bruchteile über eine
+  // Verschiebung der Kartenreihe (läuft auf der Grafikkarte, deshalb ohne Ruckeln).
+  // Kopien der Karten hängen hinten an, damit es endlos weitergeht.
+  // Anfassen, Wischen oder Maus darüber hält kurz an.
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const heroRail = document.getElementById('heroRail');
-  const running = new Map();   // Karussell -> { set, speed, pos, until, visible }
+  const hold = new WeakMap();   // Karussell -> angehalten bis
+  const held = rail => Date.now() < (hold.get(rail) || 0);
+  function pause(rail, ms) { hold.set(rail, Date.now() + ms); }
+  function watchTouch(rail) {
+    if (rail.dataset.watched) return;
+    rail.dataset.watched = '1';
+    ['pointerdown', 'focusin'].forEach(t => rail.addEventListener(t, () => pause(rail, Infinity), { passive: true }));
+    ['pointerup', 'pointercancel', 'touchend', 'focusout', 'wheel'].forEach(t => rail.addEventListener(t, () => pause(rail, 2500), { passive: true }));
+    rail.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') pause(rail, Infinity); });
+    rail.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') pause(rail, 1000); });
+  }
+
+  watchTouch(heroRail);
+  if (!reduced) setInterval(() => {
+    if (held(heroRail) || document.hidden || document.querySelector('.backdrop')) return;
+    const first = heroRail.querySelector('.card'); if (!first) return;
+    const step = first.offsetWidth + 12, max = heroRail.scrollWidth - heroRail.clientWidth;
+    heroRail.scrollTo({ left: heroRail.scrollLeft + step > max + 2 ? 0 : heroRail.scrollLeft + step, behavior: 'smooth' });
+  }, 3500);
+
+  const running = new Map();   // Karussell -> { track, set, speed, pos, whole, visible, resync }
   const seen = new IntersectionObserver(list => list.forEach(x => { const a = running.get(x.target); if (a) a.visible = x.isIntersecting; }));
-  function pause(rail, ms) { const a = running.get(rail); if (a) a.until = Date.now() + ms; }
   function autoScroll(rail, speed) {
-    const items = [...rail.querySelectorAll('.card')];
+    const track = rail.querySelector('.track');
+    const items = track ? [...track.children] : [];
     if (reduced || items.length < 2) { running.delete(rail); return; }
     const last = items[items.length - 1];
-    const set = last.offsetLeft + last.offsetWidth + parseFloat(getComputedStyle(rail).columnGap) - items[0].offsetLeft;
+    const set = last.offsetLeft + last.offsetWidth + parseFloat(getComputedStyle(track).columnGap) - items[0].offsetLeft;
     for (let k = Math.ceil(rail.clientWidth / set); k > 0; k--) items.forEach(el => {
       const c = el.cloneNode(true);
       c.setAttribute('aria-hidden', 'true');
       c.tabIndex = -1; c.querySelectorAll('button').forEach(b => { b.tabIndex = -1; });
-      rail.appendChild(c);
+      track.appendChild(c);
     });
-    if (!running.has(rail)) {
-      ['pointerdown', 'focusin'].forEach(t => rail.addEventListener(t, () => pause(rail, Infinity), { passive: true }));
-      ['pointerup', 'pointercancel', 'touchend', 'focusout', 'wheel'].forEach(t => rail.addEventListener(t, () => pause(rail, 2500), { passive: true }));
-      rail.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') pause(rail, Infinity); });
-      rail.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') pause(rail, 1000); });
-      seen.observe(rail);
-    }
-    running.set(rail, { set, speed, pos: rail.scrollLeft, until: 0, visible: true });
+    watchTouch(rail);
+    seen.observe(rail);
+    running.set(rail, { track, set, speed, pos: 0, whole: -1, visible: true, resync: false });
   }
   let lastT = 0;
   function tick(t) {
     const dt = lastT ? Math.min(t - lastT, 50) : 0; lastT = t;
     if (!document.hidden && !document.querySelector('.backdrop')) running.forEach((a, rail) => {
       if (!rail.isConnected) { seen.unobserve(rail); running.delete(rail); return; }
-      if (!a.visible || Date.now() < a.until) return;
-      if (Math.abs(rail.scrollLeft - a.pos) > 2) a.pos = rail.scrollLeft;   // nach dem Wischen dort weitermachen
+      if (!a.visible) return;
+      if (held(rail)) { a.resync = true; return; }
+      if (a.resync) { a.pos = rail.scrollLeft; a.whole = -1; a.resync = false; }   // nach dem Wischen dort weitermachen
       a.pos += a.speed * dt / 1000;
       if (a.pos >= a.set) a.pos -= a.set;
-      rail.scrollLeft = a.pos;
+      const whole = Math.floor(a.pos);
+      if (whole !== a.whole) { rail.scrollLeft = whole; a.whole = whole; }
+      a.track.style.transform = `translate3d(${(whole - a.pos).toFixed(2)}px,0,0)`;
     });
     requestAnimationFrame(tick);
   }
@@ -712,34 +728,64 @@ footer a { color: var(--fg); }
     const favLabel = () => isFav(ev.id) ? I.heartFill + 'Gemerkt' : I.heart + 'Merken';
     const s = openSheet(`
       <div class="d-cover"><img src="${cover(ev.cover)}" alt=""><button class="x" data-close aria-label="Schließen">${I.close}</button></div>
-      <div class="d-meta"><span class="tag tag-${ev.rhythm}">${RHYTHM[ev.rhythm].label}</span>${catName(ev.cat)}</div>
+      <div class="d-meta">${catName(ev.cat)}</div>
       <h2>${esc(ev.title)}</h2>
       <ul class="facts">
         <li>${I.cal}<span>${fmtLong(ev.date)}<small>${relDay(ev.day)}</small></span></li>
-        <li>${I.clock}<span>${ev.time} – ${ev.end} Uhr</span></li>
+        <li>${I.clock}<span>${span(ev)}</span></li>
         <li>${I.pin}<span>${esc(ev.place)}<small>${esc(ev.district)}</small></span></li>
         <li>${I.ticket}<span>${esc(ev.price)}</span></li>
-        <li>${I.repeat}<span>${esc(ev.rhythmText)}</span></li>
       </ul>
       <p class="desc">${esc(ev.desc)}</p>
       <div class="actions">
         <button class="btn" data-dfav aria-pressed="${isFav(ev.id)}">${favLabel()}</button>
         <button class="btn primary" data-dshare>${I.share}Als Story teilen</button>
+        <a class="btn wide" href="${whatsapp(ev)}" target="_blank" rel="noopener">${I.chat}Per WhatsApp teilen</a>
+        <button class="btn wide" data-dcal>${I.cal}In den Kalender eintragen</button>
+        <a class="btn wide" href="${esc(ev.url)}" target="_blank" rel="noopener">${I.out}Zum Veranstalter</a>
       </div>
+      <p class="note">Oder in den <a href="${googleCal(ev)}" target="_blank" rel="noopener">Google Kalender eintragen</a></p>
       <p class="note">Beispielveranstaltung, erfundene Daten</p>`);
     s.sheet.addEventListener('click', e => {
       const b = e.target.closest('[data-dfav]');
       if (b) { toggleFav(ev.id); b.setAttribute('aria-pressed', isFav(ev.id)); b.innerHTML = favLabel(); }
       if (e.target.closest('[data-dshare]')) { s.close(); openShare(ev); }
+      if (e.target.closest('[data-dcal]')) addToCalendar(ev);
     });
   }
+
+  /* ----- Kalender und WhatsApp ----- */
+  const where = ev => `${ev.place}, ${ev.district}, Chemnitz`;
+  const stamp = (d, t) => `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}T${t.replace(':', '')}00`;
+  function times(ev) {   // endet es nach Mitternacht, zählt der nächste Tag
+    const endDay = new Date(ev.date);
+    if (ev.end <= ev.time) endDay.setDate(endDay.getDate() + 1);
+    return [stamp(ev.date, ev.time), stamp(endDay, ev.end)];
+  }
+  function addToCalendar(ev) {   // Kalenderdatei (ICS): öffnet sich auf dem iPhone direkt im Kalender
+    const [a, b] = times(ev), t = v => v.replace(/[\\;,]/g, m => '\\' + m).replace(/\n/g, '\\n');
+    const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Was ist los in Chemnitz//DE', 'BEGIN:VEVENT',
+      `UID:${ev.id}-${a}@was-ist-los-in-chemnitz`, `DTSTAMP:${new Date().toISOString().replace(/[-:]|\.\d+/g, '')}`,
+      `DTSTART:${a}`, `DTEND:${b}`, `SUMMARY:${t(ev.title)}`, `LOCATION:${t(where(ev))}`,
+      `DESCRIPTION:${t(ev.desc + '\n' + ev.url)}`, `URL:${ev.url}`, 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(new Blob([ics], { type: 'text/calendar;charset=utf-8' }));
+    link.download = 'veranstaltung.ics';
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(link.href), 10000);
+  }
+  function googleCal(ev) {
+    const [a, b] = times(ev), q = encodeURIComponent;
+    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${q(ev.title)}&dates=${a}/${b}&ctz=Europe/Berlin&location=${q(where(ev))}&details=${q(ev.desc + '\n' + ev.url)}`;
+  }
+  const whatsapp = ev => 'https://wa.me/?text=' + encodeURIComponent(`*${ev.title}*\n${fmtLong(ev.date)}, ${span(ev)}\n${ev.place}, ${ev.district}\n${ev.url}`);
 
   function openFavorites() {
     const body = () => {
       const list = favs.map(byId).filter(Boolean).sort((a, b) => a.day - b.day || a.time.localeCompare(b.time));
       return `<div class="sheet-top"><strong>Merkliste</strong><button class="x" data-close aria-label="Schließen">${I.close}</button></div>
         ${list.length ? `<ul class="favlist">${list.map(e => `<li><img src="${cover(e.cover)}" alt="">
-          <button class="open" data-open="${e.id}"><b>${esc(e.title)}</b><span>${shortDate(e)}, ${e.time} Uhr · ${esc(e.place)}</span></button>
+          <button class="open" data-open="${e.id}"><b>${esc(e.title)}</b><span>${shortDate(e)}, ${hm(e.time)} Uhr · ${esc(e.place)}</span></button>
           <button class="heart" data-unfav="${e.id}" aria-pressed="true" aria-label="Von Merkliste entfernen">${I.heartFill}</button></li>`).join('')}</ul>
           <p class="note">Nur auf diesem Gerät gespeichert, ohne Konto.</p>`
         : `<p class="fav-empty">Noch nichts gemerkt.<br>Tippe bei einer Veranstaltung auf das Herz.</p>`}`;
@@ -775,12 +821,11 @@ footer a { color: var(--fg); }
     x.clip(); x.drawImage(art, P, top); x.restore();
 
     let y = top + S + 90;
-    // Merkmal
+    // Kategorie
     x.font = `700 32px ${F}`;
-    const label = `${RHYTHM[ev.rhythm].label.toUpperCase()}  ·  ${catName(ev.cat).toUpperCase()}`;
     if ('letterSpacing' in x) x.letterSpacing = '3px';
-    x.fillStyle = ev.rhythm === 'regelmaessig' ? 'rgba(255,255,255,.6)' : '#FFFFFF';
-    x.fillText(label, P, y);
+    x.fillStyle = '#FFFFFF';
+    x.fillText(catName(ev.cat).toUpperCase(), P, y);
     if ('letterSpacing' in x) x.letterSpacing = '0px';
 
     // Titel (max. 3 Zeilen)
@@ -793,7 +838,7 @@ footer a { color: var(--fg); }
 
     // Datum, Zeit, Ort
     x.font = `700 46px ${F}`; x.fillStyle = '#FFFFFF';
-    x.fillText(`${fmtLong(ev.date)} · ${ev.time} Uhr`, P, y);
+    x.fillText(`${fmtLong(ev.date)} · ${span(ev)}`, P, y);
     x.font = `500 40px ${F}`; x.fillStyle = 'rgba(255,255,255,.72)';
     x.fillText(wrap(x, `${ev.place}, ${ev.district}`, W - P * 2)[0], P, y + 58);
 
