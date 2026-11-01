@@ -94,6 +94,11 @@ img { max-width: 100%; display: block; }
 .card .cv { position: relative; aspect-ratio: 4 / 5; border-radius: 10px; overflow: hidden; background: var(--surface); max-width: 100%; }
 .card .cv img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; }
 .card:hover .cv img { transform: scale(1.03); }
+.card .cv video { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Besondere Momente: Bild ohne Video/WebP bekommt einen langsamen Zoom, aber nur solange die Karte sichtbar ist */
+.card.lg .cv img:not([data-webp]) { animation: drift 9s ease-in-out infinite alternate paused; }
+.card.lg.live .cv img { animation-play-state: running; }
+@keyframes drift { to { transform: scale(1.14) translate(-3%, -2%); } }
 .card .c-date { margin-top: 7px; font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--fg); font-variant-numeric: tabular-nums; }
 .card h3 { font-family: var(--font-display); font-size: 13.5px; line-height: 1.2; letter-spacing: -.01em; margin: 2px 0 0; text-wrap: balance; }
 .card .c-place { color: var(--fg2); font-size: 12px; margin-top: 2px; }
@@ -202,7 +207,7 @@ footer a { color: var(--fg); }
 
 @keyframes up { from { transform: translateY(40px); opacity: .4; } to { transform: none; opacity: 1; } }
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { .backdrop, .sheet, .fav-btn.bump { animation: none; } .card .cv img { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .backdrop, .sheet, .fav-btn.bump { animation: none; } .card .cv img { transition: none; } .card.lg .cv img { animation: none; } }
 </style>
 </head>
 <body>
@@ -268,6 +273,12 @@ footer a { color: var(--fg); }
   // Merkmal (intern, wird nicht angezeigt): je seltener, desto weiter oben
   const WEIGHT = { einmalig: 300, selten: 260, jaehrlich: 160, regelmaessig: 0 };
   const LINK = 'https://example.com/veranstaltung/'; // Platzhalter, echte Veranstalter-Links kommen mit den echten Daten
+  // Optionale Medien für „Besondere Momente“, je Veranstaltung (id):
+  //   video: MP4 (H.264), 3–5 Sekunden, ohne Ton, ca. 480 × 600 Pixel, möglichst unter 500 KB
+  //   webp:  animiertes WebP, ca. 480 × 600 Pixel, möglichst unter 400 KB
+  // Reihenfolge: Video, sonst animiertes Bild, sonst normales Bild mit sanftem Zoom.
+  // Beispiel: a03: { video: 'medien/orgelnacht.mp4', webp: 'medien/orgelnacht.webp' }
+  const MEDIA = {};
   const LIST_DAYS = 7; // Tagesleiste: heute + 6 Tage
 
   // Besondere Termine: [id, Tage ab heute, Beginn, Ende, Kategorie, Merkmal, Rhythmus-Text, Titel, Ort, Stadtteil, Preis, Beschreibung]
@@ -280,14 +291,21 @@ footer a { color: var(--fg); }
     ['a06', 2, '20:30', '22:00', 'kultur', 'jaehrlich', 'Einmal im Jahr', 'Stummfilmnacht mit Live-Klavier', 'Weltecho', 'Zentrum', '9 €', 'Zwei Stummfilmklassiker, live und improvisiert am Flügel begleitet.'],
     ['a07', 2, '18:00', '19:30', 'kultur', 'einmalig', 'Einmaliger Vortrag', 'Chemnitz von oben: Luftbilder aus 100 Jahren', 'Stadtbibliothek im TIETZ', 'Zentrum', '5 €', 'Ein Fotograf zeigt Luftaufnahmen der Stadt von 1925 bis heute und erzählt, wie sie entstanden sind.'],
     ['a08', 3, '19:00', '20:30', 'fuehrung', 'jaehrlich', 'Einmal im Jahr', 'Nachtführung im Versteinerten Wald', 'Museum für Naturkunde', 'Zentrum', '10 €, Anmeldung empfohlen', 'Mit Taschenlampen durch die 290 Millionen Jahre alten Baumstämme und die dunkle Ausstellung.'],
-    ['a09', 3, '20:00', '21:15', 'familie', 'einmalig', 'Einmalige Aufführung', 'Live-Hörspiel unter der Sternenkuppel', 'Planetarium', 'Rabenstein', '8 €', 'Sprecher, Geräuschemacher und Musik live, dazu der Sternenhimmel über den Köpfen. Für alle ab 8 Jahren.'],
+    ['a09', 5, '20:00', '21:15', 'familie', 'einmalig', 'Einmalige Aufführung', 'Live-Hörspiel unter der Sternenkuppel', 'Planetarium', 'Rabenstein', '8 €', 'Sprecher, Geräuschemacher und Musik live, dazu der Sternenhimmel über den Köpfen. Für alle ab 8 Jahren.'],
     ['a10', 4, '18:00', '22:00', 'kultur', 'einmalig', 'Einmalige Veranstaltung', 'Lichtprojektion am Karl-Marx-Kopf', 'Brückenstraße', 'Zentrum', 'Kostenlos', 'Ein Künstlerkollektiv projiziert für einen Abend Bilder aus 70 Jahren Stadtgeschichte auf das Monument.'],
     ['a11', 4, '19:00', '21:00', 'sport', 'jaehrlich', 'Einmal im Jahr', 'Volleyball: Finale um den Stadtpokal', 'Sporthalle Brühl', 'Brühl', '5 €', 'Die beiden besten Vereinsteams der Stadt spielen um den Pokal.'],
     ['a12', 5, '14:00', '19:00', 'familie', 'einmalig', 'Einmalig zur Eröffnung', 'Brückenfest: Die neue Fußgängerbrücke öffnet', 'Ufer am Falkeplatz', 'Zentrum', 'Kostenlos', 'Eröffnung mit Musik, Bastelzelt und Entenrennen auf der Chemnitz.'],
     ['a13', 5, '23:00', '05:00', 'musik', 'einmalig', 'Einmaliger Gastauftritt', 'Clubnacht mit Gästen aus Tokio', 'Atomino', 'Zentrum', '14 €', 'Drei DJs aus Tokio spielen zum ersten Mal in Sachsen. Einlass ab 18 Jahren.'],
     ['a14', 6, '10:00', '16:00', 'markt', 'jaehrlich', 'Einmal im Jahr', 'Hinterhof-Flohmarkt', 'Rund um den Lessingplatz', 'Sonnenberg', 'Eintritt frei', 'Über 40 Höfe öffnen ihre Tore. Ein Plan mit allen Stationen liegt am Lessingplatz aus.'],
     ['a15', 6, '12:00', '18:00', 'musik', 'jaehrlich', 'Zweimal im Jahr', 'Plattenbörse', 'Atomino', 'Zentrum', '2 €', 'Händler und Sammler verkaufen Vinyl, Kassetten und CDs. Plattenspieler zum Probehören stehen bereit.'],
-    ['a16', 6, '11:00', '15:00', 'kultur', 'selten', 'Nur alle 3 Jahre', 'Die große Dampfmaschine läuft', 'Industriemuseum', 'Altchemnitz', 'Museumseintritt', 'Die historische Dampfmaschine wird nur alle paar Jahre angeheizt. Zuschauen, hören, riechen.']
+    ['a16', 6, '11:00', '15:00', 'kultur', 'selten', 'Nur alle 3 Jahre', 'Die große Dampfmaschine läuft', 'Industriemuseum', 'Altchemnitz', 'Museumseintritt', 'Die historische Dampfmaschine wird nur alle paar Jahre angeheizt. Zuschauen, hören, riechen.'],
+    ['a17', 1, '14:30', '16:00', 'fuehrung', 'jaehrlich', 'Einmal im Jahr', 'Tag der offenen Hausflure', 'Kaßberg, Treffpunkt Weststraße', 'Kaßberg', '5 €', 'Bewohner öffnen die prächtigsten Treppenhäuser der Gründerzeit. Eine Stadtführerin erzählt die Geschichten dazu.'],
+    ['a18', 1, '17:00', '21:00', 'essen', 'einmalig', 'Einmalige Veranstaltung', 'Wintergrillen am Brühl', 'Brühl-Boulevard', 'Brühl', 'Eintritt frei', 'Zum Abschluss der Bauarbeiten grillen die Läden am Brühl gemeinsam. Mit Feuerschalen und heißem Apfelsaft.'],
+    ['a19', 1, '19:30', '21:45', 'kultur', 'einmalig', 'Premiere', 'Premiere: Die Weber von Chemnitz', 'Schauspielhaus', 'Kaßberg', '24 €', 'Ein neues Stück über die Webstuhlstadt Chemnitz, entwickelt mit Zeitzeugen aus der Region.'],
+    ['a20', 5, '17:00', '18:30', 'familie', 'jaehrlich', 'Einmal im Jahr', 'Laternenumzug durch den Stadtpark', 'Stadtpark, Eingang Annaberger Straße', 'Bernsdorf', 'Kostenlos', 'Mit Blaskapelle und Laternen vom Stadtpark bis zur Wiese am Teich. Danach Stockbrot am Feuer.'],
+    ['a21', 5, '19:00', '21:00', 'musik', 'einmalig', 'Einmaliges Jubiläum', 'Jubiläumskonzert: 50 Jahre Kammerchor', 'Kreuzkirche', 'Kaßberg', '14 €', 'Der Kammerchor feiert mit ehemaligen Mitgliedern aus fünf Jahrzehnten und singt Stücke aus jeder Zeit.'],
+    ['a22', 5, '22:00', '01:00', 'sport', 'jaehrlich', 'Einmal im Jahr', 'Mitternachtsbasketball', 'Sporthalle am Sonnenberg', 'Sonnenberg', 'Kostenlos', 'Offenes Turnier für Teams ab 16 Jahren. Musik vom DJ, Anmeldung vor Ort.'],
+    ['a23', 6, '10:30', '17:00', 'markt', 'jaehrlich', 'Einmal im Jahr', 'Kürbismarkt am Schloßteich', 'Schloßteich, Uferweg', 'Schloßchemnitz', 'Eintritt frei', 'Über 60 Kürbissorten, Kürbissuppe aus dem Kessel und Schnitzen für Kinder.']
   ];
 
   // Regelmäßige Reihen: an welchen Wochentagen (0 = Sonntag) sie stattfinden
@@ -303,14 +321,34 @@ footer a { color: var(--fg); }
     { id: 'r09', wd: [4],       time: '21:00', end: '23:30', cat: 'musik',    freq: 'Jeden Donnerstag', title: 'Jazz-Session', place: 'Weltecho', district: 'Zentrum', price: 'Hut geht rum', desc: 'Offene Bühne: Die Hausband beginnt, danach darf jede und jeder mitspielen.' },
     { id: 'r10', wd: [5],       time: '16:00', end: '21:00', cat: 'essen',    freq: 'Jeden Freitag', title: 'Feierabendmarkt', place: 'Rosenhof', district: 'Zentrum', price: 'Eintritt frei', desc: 'Streetfood, regionale Weine und Musik zum Wochenende.' },
     { id: 'r11', wd: [1],       time: '19:00', end: '21:00', cat: 'musik',    freq: 'Jeden Montag', title: 'Offenes Singen', place: 'Lutherkirche', district: 'Lutherviertel', price: 'Kostenlos', desc: 'Volkslieder, Pop und Kanons zum Mitsingen. Keine Vorkenntnisse nötig.' },
-    { id: 'r12', wd: [3],       time: '19:00', end: '20:30', cat: 'kultur',   freq: 'Jeden ersten Mittwoch im Monat', title: 'Lesung: Chemnitzer Stadtgeschichten', place: 'Stadtbibliothek im TIETZ', district: 'Zentrum', price: '4 €', desc: 'Autorinnen und Autoren aus der Region lesen kurze Texte über die Stadt.' }
+    { id: 'r12', wd: [3],       time: '19:00', end: '20:30', cat: 'kultur',   freq: 'Jeden ersten Mittwoch im Monat', title: 'Lesung: Chemnitzer Stadtgeschichten', place: 'Stadtbibliothek im TIETZ', district: 'Zentrum', price: '4 €', desc: 'Autorinnen und Autoren aus der Region lesen kurze Texte über die Stadt.' },
+    { id: 'r13', wd: [1, 2, 3, 4, 5], time: '06:30', end: '08:00', cat: 'sport', freq: 'Montag bis Freitag', title: 'Frühschwimmen im Stadtbad', place: 'Stadtbad', district: 'Zentrum', price: '4 €', desc: 'Bahnen ziehen im denkmalgeschützten Jugendstilbad, bevor der Tag beginnt.' },
+    { id: 'r14', wd: [0, 6], time: '09:30', end: '10:30', cat: 'sport', freq: 'Jeden Sa und So', title: 'Yoga im Park', place: 'Schloßteichpark, Wiese am Pavillon', district: 'Schloßchemnitz', price: 'Spende', desc: 'Sanftes Yoga für alle. Bitte eine eigene Matte mitbringen.' },
+    { id: 'r15', wd: [3, 5], time: '12:30', end: '13:00', cat: 'musik', freq: 'Jeden Mi und Fr', title: 'Mittagsorgel', place: 'St. Petrikirche', district: 'Zentrum', price: 'Eintritt frei', desc: 'Eine halbe Stunde Orgelmusik zur Mittagspause.' },
+    { id: 'r16', wd: [0, 2, 4, 6], time: '14:00', end: '15:30', cat: 'fuehrung', freq: 'Jeden Di, Do, Sa und So', title: 'Stadtrundgang durch die Innenstadt', place: 'Treffpunkt Roter Turm', district: 'Zentrum', price: '9 €', desc: 'Vom Roten Turm über den Markt bis zum Karl-Marx-Monument: 900 Jahre Stadtgeschichte in 90 Minuten.' },
+    { id: 'r17', wd: [2], time: '16:00', end: '16:45', cat: 'familie', freq: 'Jeden Dienstag', title: 'Vorlesestunde für Kinder', place: 'Stadtbibliothek im TIETZ', district: 'Zentrum', price: 'Kostenlos', desc: 'Bilderbücher zum Zuhören und Mitmachen für Kinder ab 3 Jahren.' },
+    { id: 'r18', wd: [1, 3, 5], time: '19:30', end: '21:30', cat: 'kultur', freq: 'Jeden Mo, Mi und Fr', title: 'Filmklub', place: 'Clubkino Siegmar', district: 'Siegmar', price: '7 €', desc: 'Filmklassiker und Neuentdeckungen, danach Gespräch im Foyer.' },
+    { id: 'r19', wd: [1], time: '18:00', end: '22:00', cat: 'sport', freq: 'Jeden Montag', title: 'Offener Boulderabend', place: 'Boulderhalle im Spinnbau', district: 'Altchemnitz', price: '11 €', desc: 'Neue Routen, Leihschuhe vor Ort, Einsteiger bekommen eine kurze Einführung.' },
+    { id: 'r20', wd: [3, 5], time: '09:00', end: '13:00', cat: 'markt', freq: 'Jeden Mi und Fr', title: 'Bauernmarkt am Rosenplatz', place: 'Rosenplatz', district: 'Zentrum', price: 'Eintritt frei', desc: 'Eier, Honig, Brot und Gemüse direkt von Höfen aus dem Erzgebirge.' },
+    { id: 'r21', wd: [0], time: '18:00', end: '22:00', cat: 'familie', freq: 'Jeden Sonntag', title: 'Brettspielabend', place: 'Café im Weltecho', district: 'Zentrum', price: 'Kostenlos', desc: 'Über 200 Spiele zum Ausleihen, Erklärer helfen beim Einstieg.' },
+    { id: 'r22', wd: [2], time: '20:30', end: '23:30', cat: 'musik', freq: 'Jeden Dienstag', title: 'Salsa-Abend', place: 'Lokomov', district: 'Sonnenberg', price: '5 €', desc: 'Um 20:30 Uhr ein Schnupperkurs, danach freies Tanzen.' },
+    { id: 'r23', wd: [2, 3, 4, 5, 6], time: '19:30', end: '22:00', cat: 'kultur', freq: 'Dienstag bis Samstag', title: 'Abendvorstellung im Figurentheater', place: 'Figurentheater', district: 'Zentrum', price: '16 €', desc: 'Puppenspiel für Erwachsene: wechselnde Stücke aus dem Repertoire.' },
+    { id: 'r24', wd: [0, 6], time: '15:00', end: '16:00', cat: 'fuehrung', freq: 'Jeden Sa und So', title: 'Führung durch das Industriemuseum', place: 'Industriemuseum', district: 'Altchemnitz', price: 'Museumseintritt', desc: 'Von der Spinnmaschine bis zum Trabant: Industriegeschichte zum Anfassen.' },
+    { id: 'r25', wd: [0], time: '15:00', end: '18:00', cat: 'musik', freq: 'Jeden Sonntag', title: 'Tanztee', place: 'Stadthalle, Kleiner Saal', district: 'Zentrum', price: '6 €', desc: 'Livemusik von Walzer bis Foxtrott, dazu Kaffee und Kuchen.' },
+    { id: 'r26', wd: [1, 2, 3, 4, 5], time: '11:30', end: '14:00', cat: 'essen', freq: 'Montag bis Freitag', title: 'Streetfood-Mittag', place: 'Neumarkt', district: 'Zentrum', price: 'Eintritt frei', desc: 'Drei wechselnde Foodtrucks zur Mittagszeit.' },
+    { id: 'r27', wd: [4], time: '19:00', end: '21:00', cat: 'essen', freq: 'Jeden Donnerstag', title: 'Weinprobe', place: 'Weinhandlung am Kaßberg', district: 'Kaßberg', price: '18 €', desc: 'Sechs Weine aus Sachsen und Saale-Unstrut, dazu Brot und Käse.' },
+    { id: 'r28', wd: [0, 6], time: '10:00', end: '13:00', cat: 'sport', freq: 'Jeden Sa und So', title: 'Radtour ins Grüne', place: 'Treffpunkt Markt', district: 'Zentrum', price: 'Kostenlos', desc: 'Gemütliche Tour über 30 Kilometer, Rückkehr bis 13 Uhr.' },
+    { id: 'r29', wd: [0, 6], time: '10:30', end: '12:00', cat: 'familie', freq: 'Jeden Sa und So', title: 'Familienwerkstatt im Museum', place: 'Museum Gunzenhauser', district: 'Zentrum', price: '3 € pro Kind', desc: 'Malen und Basteln nach Bildern aus der Sammlung.' },
+    { id: 'r30', wd: [1], time: '20:00', end: '22:00', cat: 'kultur', freq: 'Jeden Montag', title: 'Lesebühne', place: 'Kraftwerk', district: 'Kaßberg', price: '6 €', desc: 'Vier Autorinnen und Autoren lesen neue Texte, dazwischen Musik.' },
+    { id: 'r31', wd: [1, 2, 4, 5], time: '17:00', end: '18:30', cat: 'fuehrung', freq: 'Mo, Di, Do und Fr', title: 'Kunstspaziergang Kaßberg', place: 'Treffpunkt Kaßbergauffahrt', district: 'Kaßberg', price: '8 €', desc: 'Jugendstil-Fassaden und Wandbilder im größten Gründerzeitviertel Deutschlands.' },
+    { id: 'r32', wd: [1], time: '09:00', end: '12:00', cat: 'markt', freq: 'Jeden Montag', title: 'Trödelecke am Lessingplatz', place: 'Lessingplatz', district: 'Sonnenberg', price: 'Eintritt frei', desc: 'Kleiner Trödelmarkt mit Büchern, Geschirr und Schallplatten.' }
   ];
 
   const TODAY = new Date(); TODAY.setHours(0, 0, 0, 0);
   const dayDate = n => { const d = new Date(TODAY); d.setDate(d.getDate() + n); return d; };
 
   const EVENTS = [];
-  SPECIAL.forEach(a => EVENTS.push({ id: a[0], day: a[1], time: a[2], end: a[3], cat: a[4], rhythm: a[5], rhythmText: a[6], title: a[7], place: a[8], district: a[9], price: a[10], desc: a[11], url: LINK + a[0], cover: a[0], date: dayDate(a[1]) }));
+  SPECIAL.forEach(a => EVENTS.push({ id: a[0], day: a[1], time: a[2], end: a[3], cat: a[4], rhythm: a[5], rhythmText: a[6], title: a[7], place: a[8], district: a[9], price: a[10], desc: a[11], url: LINK + a[0], cover: a[0], date: dayDate(a[1]), ...MEDIA[a[0]] }));
   for (let n = 0; n < LIST_DAYS; n++) {
     const d = dayDate(n);
     SERIES.forEach(s => {
@@ -450,6 +488,11 @@ footer a { color: var(--fg); }
     ctx.putImageData(img, 0, 0);
   }
   const coverCache = {};
+  const lazy = new IntersectionObserver(list => list.forEach(x => {
+    if (!x.isIntersecting) return;
+    lazy.unobserve(x.target);
+    x.target.querySelectorAll('[data-cover]').forEach(el => { const k = el.tagName === 'VIDEO' ? 'poster' : 'src'; if (!el[k]) el[k] = cover(el.dataset.cover); });
+  }), { rootMargin: '400px 0px' });
   function cover(key) {
     if (coverCache[key]) return coverCache[key];
     const S = 480, cv = document.createElement('canvas'); cv.width = cv.height = S;
@@ -466,8 +509,10 @@ footer a { color: var(--fg); }
   };
   function card(ev, size) {
     const dateLine = `${ev.rhythm === 'regelmaessig' ? esc(ev.rhythmText) : shortDate(ev)} · ${hm(ev.time)} Uhr`;
-    return `<article class="card ${size || ''}" data-id="${ev.id}" tabindex="0" aria-label="${esc(ev.title)}">
-      <div class="cv"><img src="${cover(ev.cover)}" alt="">
+    const media = ev.video ? `<video data-cover="${ev.cover}" data-video="${esc(ev.video)}" muted loop playsinline preload="none"></video>`
+      : `<img data-cover="${ev.cover}" ${ev.webp ? `data-webp="${esc(ev.webp)}"` : ''} alt="">`;
+    return `<article class="card ${size}" data-id="${ev.id}" tabindex="0" aria-label="${esc(ev.title)}">
+      <div class="cv">${media}
         ${heartBtn(ev, true)}</div>
       <div class="c-date">${dateLine}</div>
       <h3>${esc(ev.title)}</h3>
@@ -477,8 +522,8 @@ footer a { color: var(--fg); }
   }
   function row(ev) {
     return `<div class="row" data-id="${ev.id}" tabindex="0" role="button" aria-label="${esc(ev.title)}, ${span(ev)}">
-      <div class="time">${ev.time}<small>–<br>${ev.end}</small></div>
-      <img class="thumb" src="${cover(ev.cover)}" alt="">
+      <div class="time">${ev.time}<small>${ev.end}</small></div>
+      <img class="thumb" data-cover="${ev.cover}" alt="">
       <div class="main"><div class="ti">${esc(ev.title)}</div>
         <div class="su">${esc(ev.place)}</div></div>
       <div class="cat">${catName(ev.cat)}</div>
@@ -512,9 +557,18 @@ footer a { color: var(--fg); }
 
   function renderHero() {
     const list = rank(EVENTS.filter(e => e.rhythm !== 'regelmaessig' && shown(e)));
-    heroRail.innerHTML = list.length ? list.map(e => card(e)).join('') : `<p class="empty">Keine besonderen Termine in den gewählten Kategorien.</p>`;
+    heroRail.innerHTML = list.length ? list.map(e => card(e, 'lg')).join('') : `<p class="empty">Keine besonderen Termine in den gewählten Kategorien.</p>`;
     heroRail.scrollLeft = 0;
+    live.disconnect();
+    if (!reduced) heroRail.querySelectorAll('.card').forEach(c => live.observe(c));
   }
+  // Nur ganz sichtbare Karten bewegen sich: Video läuft, WebP wird geladen, sonst Zoom.
+  const live = new IntersectionObserver(list => list.forEach(({ target: c, isIntersecting: on }) => {
+    c.classList.toggle('live', on);
+    const v = c.querySelector('video'), w = c.querySelector('[data-webp]');
+    if (v) { if (on) { if (!v.src) v.src = v.dataset.video; v.play().catch(() => {}); } else v.pause(); }
+    if (w) w.src = on ? w.dataset.webp : cover(w.dataset.cover);
+  }), { threshold: .9 });
 
   function renderDays() {
     let html = '';
@@ -564,7 +618,10 @@ footer a { color: var(--fg); }
     document.getElementById('favBtn').innerHTML = `${n ? I.heartFill : I.heart}Merkliste${n ? ` <span class="n">${n}</span>` : ''}`;
   }
 
-  function renderAll() { renderFilters(); renderHero(); renderDays(); renderList(); renderRegular(); renderFavBtn(); }
+  function renderAll() {
+    renderFilters(); renderHero(); renderDays(); renderList(); renderRegular(); renderFavBtn();
+    document.querySelectorAll('#heroRail, .day, #regRail').forEach(el => lazy.observe(el));
+  }
 
   // Herz umschalten, ohne die Seite neu aufzubauen (Karussells bleiben an ihrer Stelle)
   function syncHearts(id) {
