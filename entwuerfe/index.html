@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Chemnitz Startseiten-Entwürfe</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Übersicht: drei große Auswahlflächen untereinander (iPhone) bzw. nebeneinander (Desktop) */
+:root {
+  --bg: #F2F2F7; --card: #FFFFFF; --fg: #1C1C1E; --fg2: #6E6E76; --sep: rgba(60,60,67,.16); --accent: #0066CC;
+  --c1: #127FA0; --c2: #D6336C; --c3: #3D4BC7;
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "Segoe UI", Roboto, Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #000; --card: #1C1C1E; --fg: #F2F2F7; --fg2: #9A9AA1; --sep: rgba(84,84,88,.55); --accent: #3B9BFF; color-scheme: dark; } }
+:root[data-theme="dark"] { --bg: #000; --card: #1C1C1E; --fg: #F2F2F7; --fg2: #9A9AA1; --sep: rgba(84,84,88,.55); --accent: #3B9BFF; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 16px; -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 1000px; margin: 0 auto; padding-block: 28px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.eyebrow { font-size: 13px; font-weight: 650; letter-spacing: .06em; text-transform: uppercase; color: var(--fg2); }
+h1 { font-size: clamp(30px, 8vw, 42px); letter-spacing: -.025em; line-height: 1.06; margin: 6px 0 10px; text-wrap: balance; }
+.lead { color: var(--fg2); font-size: 17px; line-height: 1.5; max-width: 60ch; margin: 0 0 26px; }
+.grid { display: grid; gap: 14px; }
+@media (min-width: 820px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+a.opt { display: flex; flex-direction: column; gap: 10px; background: var(--card); border-radius: 20px; padding: 20px; color: inherit; text-decoration: none; border: 1px solid var(--sep); transition: transform .15s; }
+a.opt:hover { transform: translateY(-2px); }
+a.opt:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.preview { height: 120px; border-radius: 14px; background: var(--bg); position: relative; overflow: hidden; display: grid; gap: 6px; padding: 12px; }
+.num { width: 30px; height: 30px; border-radius: 50%; background: var(--c); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 15px; }
+h2 { font-size: 20px; letter-spacing: -.01em; margin: 0; }
+a.opt p { margin: 0; color: var(--fg2); line-height: 1.45; font-size: 15px; }
+.go { margin-top: auto; color: var(--accent); font-weight: 600; font-size: 15px; }
+/* Mini-Vorschauen */
+.p1 .big { height: 52px; border-radius: 10px; background: linear-gradient(150deg, var(--c1), #0A3F50); }
+.p1 .ln { height: 12px; border-radius: 6px; background: var(--card); }
+.p2 { display: flex; gap: 8px; padding: 12px 0 12px 12px; }
+.p2 i { flex: none; width: 70px; border-radius: 12px; background: linear-gradient(160deg, var(--c), #2a0f1a); }
+.p3 .seg { height: 16px; border-radius: 6px; background: var(--card); width: 70%; }
+.p3 .r { display: flex; gap: 8px; align-items: center; }
+.p3 .r b { width: 26px; height: 10px; border-radius: 4px; background: var(--fg2); opacity: .5; }
+.p3 .r span { flex: 1; height: 10px; border-radius: 4px; background: var(--card); }
+.p3 .r.hl span { background: var(--c3); opacity: .7; }
+.help { margin-top: 32px; background: var(--card); border-radius: 20px; padding: 20px; border: 1px solid var(--sep); }
+.help h3 { margin: 0 0 8px; font-size: 18px; }
+.help ul { margin: 0; padding-left: 20px; line-height: 1.6; color: var(--fg2); max-width: 70ch; }
+.help li strong { color: var(--fg); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Was ist los in Chemnitz · Entwürfe</div>
+  <h1>Drei Entwürfe für die Startseite</h1>
+  <p class="lead">Alle drei zeigen dieselben erfundenen Beispielveranstaltungen der nächsten Tage. Seltenes und Einmaliges steht immer oben, Regelmäßiges darunter. Merkliste und Interessen werden nur in deinem Browser gespeichert und gelten für alle drei Entwürfe.</p>
+
+  <div class="grid">
+    <a class="opt" href="entwurf-1-liste.html" style="--c:var(--c1)">
+      <div class="preview p1" aria-hidden="true"><div class="big"></div><div class="ln"></div><div class="ln" style="width:70%"></div></div>
+      <div class="num">1</div>
+      <h2>Ruhige Liste</h2>
+      <p>Großer Highlight-Bereich für das Seltenste ganz oben, darunter übersichtliche Listen. Filter als Knöpfe, Merkliste unten als Reiter.</p>
+      <span class="go">Entwurf 1 öffnen</span>
+    </a>
+    <a class="opt" href="entwurf-2-karten.html" style="--c:var(--c2)">
+      <div class="preview p2" aria-hidden="true"><i></i><i style="--c:#E8590C"></i><i style="--c:#8E44C9"></i><i></i></div>
+      <div class="num">2</div>
+      <h2>Karten zum Wischen</h2>
+      <p>Große farbige Karten im Apple-Stil, die man seitlich durchwischt. Kategorien als Reiter oben, „Für dich“ lernt mit.</p>
+      <span class="go">Entwurf 2 öffnen</span>
+    </a>
+    <a class="opt" href="entwurf-3-tage.html" style="--c:var(--c3)">
+      <div class="preview p3" aria-hidden="true"><div class="seg"></div><div class="r hl"><b></b><span></span></div><div class="r hl"><b></b><span></span></div><div class="r"><b></b><span></span></div><div class="r"><b></b><span></span></div></div>
+      <div class="num">3</div>
+      <h2>Tagesansicht</h2>
+      <p>Umschalter für Heute, Morgen und diese Woche. Pro Tag erst das Besondere, dann das Regelmäßige. Die Merkliste ist immer einen Fingertipp entfernt.</p>
+      <span class="go">Entwurf 3 öffnen</span>
+    </a>
+  </div>
+
+  <div class="help">
+    <h3>Zum Ausprobieren</h3>
+    <ul>
+      <li><strong>Veranstaltung antippen:</strong> Details, Merken und „Als Story teilen“.</li>
+      <li><strong>Herz:</strong> merkt die Veranstaltung. Die Merkliste bleibt auch nach dem Neuladen erhalten.</li>
+      <li><strong>Lernen:</strong> Tippe ein paar Mal auf dieselbe Kategorie, zum Beispiel „Musik“. Danach rutschen passende Termine nach oben. „Zurücksetzen“ macht das rückgängig.</li>
+      <li><strong>Story-Bild:</strong> Auf dem iPhone das Bild gedrückt halten und „Teilen…“ wählen, dann Instagram.</li>
+    </ul>
+  </div>
+</div>
+</body>
+</html>

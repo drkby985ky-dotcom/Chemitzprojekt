@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Chemnitz – Entwurf 2</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Entwurf 2 · Karten zum Wischen: Reiter oben, darunter waagrechte Kartenreihen wie im App Store ("Heute") */
+:root {
+  --bg: #FFFFFF;
+  --card: #FFFFFF;
+  --bg2: #F4F4F7;      /* Flächen für kleine Karten */
+  --fg: #111114;
+  --fg2: #6E6E76;
+  --sep: rgba(60,60,67,.14);
+  --fill: rgba(118,118,128,.12);
+  --accent: #111114;   /* ruhiges Schwarz – Farbe kommt aus den Karten */
+  --accent-fg: #FFFFFF;
+  --shadow: 0 12px 30px rgba(15,15,30,.14), 0 2px 6px rgba(15,15,30,.06);
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "Segoe UI", Roboto, Arial, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", "Segoe UI", Roboto, Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #000000; --card: #1C1C1E; --bg2: #1C1C1E; --fg: #F5F5F7; --fg2: #9A9AA1; --sep: rgba(84,84,88,.55); --fill: rgba(118,118,128,.26); --accent: #F5F5F7; --accent-fg: #000000; --shadow: 0 12px 30px rgba(0,0,0,.5); color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --bg: #000000; --card: #1C1C1E; --bg2: #1C1C1E; --fg: #F5F5F7; --fg2: #9A9AA1; --sep: rgba(84,84,88,.55); --fill: rgba(118,118,128,.26); --accent: #F5F5F7; --accent-fg: #000000; --shadow: 0 12px 30px rgba(0,0,0,.5); color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 15px; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.w-btn.primary { color: var(--accent-fg); }
+
+header { padding-block: 18px 4px; display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.today { font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--fg2); }
+h1 { font-family: var(--font-display); font-size: clamp(30px, 8vw, 40px); line-height: 1.05; letter-spacing: -.025em; margin: 4px 0 0; font-weight: 800; }
+.head-actions { display: flex; gap: 8px; align-items: center; }
+.round { appearance: none; border: 0; width: 42px; height: 42px; border-radius: 50%; background: var(--fill); color: var(--fg); display: grid; place-items: center; cursor: pointer; position: relative; text-decoration: none; }
+.round:focus-visible, .tab:focus-visible, .card:focus-visible, .mini:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+.round .count { position: absolute; top: -3px; right: -3px; background: var(--r-once); color: #fff; font-size: 11px; font-weight: 700; min-width: 18px; height: 18px; border-radius: 9px; display: grid; place-items: center; padding: 0 5px; }
+
+/* Reiter */
+.tabs-bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: saturate(180%) blur(18px); -webkit-backdrop-filter: saturate(180%) blur(18px); border-bottom: 1px solid var(--sep); }
+.tabs { display: flex; gap: 22px; overflow-x: auto; scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab { appearance: none; border: 0; background: none; font: inherit; font-size: 15.5px; font-weight: 600; color: var(--fg2); padding: 14px 0 12px; flex: none; cursor: pointer; border-bottom: 2.5px solid transparent; display: inline-flex; gap: 6px; align-items: center; }
+.tab[aria-selected="true"] { color: var(--fg); border-color: var(--fg); }
+
+.note { font-size: 13px; color: var(--fg2); margin: 14px 0 0; display: flex; gap: 6px; align-items: center; }
+.note button { all: unset; color: var(--fg); text-decoration: underline; cursor: pointer; }
+
+section { margin-top: 26px; }
+.sec-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; }
+h2 { font-family: var(--font-display); font-size: 23px; letter-spacing: -.02em; margin: 0; }
+.sec-sub { margin: 2px 0 0; color: var(--fg2); font-size: 14px; }
+.arrows { display: none; gap: 8px; }
+@media (hover: hover) and (min-width: 700px) { .arrows { display: flex; } }
+.arrows .round { width: 34px; height: 34px; }
+.arrows svg { width: 18px; height: 18px; }
+
+/* Waagrechte Kartenreihen */
+.rail { display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: max(16px, env(safe-area-inset-left, 0px));
+  padding-block: 14px 22px; scrollbar-width: none; overscroll-behavior-x: contain;
+  margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px))) calc(-1 * max(16px, env(safe-area-inset-right, 0px)));
+  padding-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px)); }
+.rail::-webkit-scrollbar { display: none; }
+@media (min-width: 1152px) { .rail { margin-inline: 0; padding-inline: 0; scroll-padding-inline: 0; } }
+
+/* Große Karte */
+.card { flex: none; width: min(84vw, 360px); aspect-ratio: 3 / 4; max-width: 100%; scroll-snap-align: start; border-radius: 24px; position: relative; overflow: hidden; color: #fff; cursor: pointer; box-shadow: var(--shadow);
+  background: radial-gradient(100% 70% at 100% 0%, color-mix(in srgb, var(--c) 65%, white) 0%, transparent 60%), linear-gradient(165deg, var(--c) 10%, color-mix(in srgb, var(--c) 38%, black) 100%);
+  display: flex; flex-direction: column; padding: 22px; transition: transform .2s; }
+.card:active { transform: scale(.98); }
+.card .big { position: absolute; right: -6px; bottom: 84px; font-family: var(--font-display); font-weight: 800; font-size: 170px; line-height: .8; letter-spacing: -.06em; color: rgba(255,255,255,.12); pointer-events: none; font-variant-numeric: tabular-nums; }
+.card .eyebrow { font-size: 12.5px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; opacity: .9; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; padding-right: 44px; }
+.card .w-badge { background: #fff; color: color-mix(in srgb, var(--c) 65%, black); }
+.card .w-badge-regelmaessig { background: rgba(255,255,255,.22); color: #fff; }
+.card h3 { font-family: var(--font-display); font-size: clamp(27px, 7.4vw, 33px); line-height: 1.05; letter-spacing: -.025em; margin: 14px 0 0; text-wrap: balance; }
+.card .foot { margin-top: auto; display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; }
+.card .when { font-size: 15px; line-height: 1.35; min-width: 0; }
+.card .when strong { display: block; font-size: 17px; }
+.card .btns { display: flex; gap: 8px; }
+.card .w-heart { color: #fff; background: rgba(255,255,255,.2); }
+.card .w-heart[aria-pressed="true"] { background: #fff; color: var(--r-once); }
+.card .fav-top { position: absolute; top: 14px; right: 14px; }
+
+/* Mittlere Karte (jährlich) */
+.card.mid { width: min(66vw, 280px); aspect-ratio: 4 / 5; }
+.card.mid h3 { font-size: clamp(22px, 6vw, 25px); }
+.card.mid .big { font-size: 120px; bottom: 70px; }
+
+/* Kleine Karten (regelmäßig) */
+.mini { flex: none; width: min(72vw, 270px); scroll-snap-align: start; background: var(--bg2); border-radius: 18px; padding: 16px; cursor: pointer; display: flex; flex-direction: column; gap: 8px; min-height: 150px; }
+.mini .top { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 650; color: var(--fg2); text-transform: uppercase; letter-spacing: .05em; }
+.mini .top span { display: inline-flex; gap: 6px; align-items: center; }
+.mini .w-heart { width: 34px; height: 34px; margin: -6px -6px -6px 0; }
+.mini h4 { margin: 0; font-size: 17px; line-height: 1.2; letter-spacing: -.01em; }
+.mini p { margin: auto 0 0; font-size: 13.5px; color: var(--fg2); line-height: 1.35; }
+
+.dots { display: flex; justify-content: center; gap: 6px; margin-top: -8px; }
+.dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--fill); transition: background .2s, width .2s; }
+.dots i.on { background: var(--fg); width: 16px; border-radius: 3px; }
+
+.empty { background: var(--bg2); border-radius: 18px; padding: 22px; color: var(--fg2); text-align: center; margin-top: 14px; line-height: 1.5; }
+footer { color: var(--fg2); font-size: 12.5px; text-align: center; padding-block: 30px calc(30px + env(safe-area-inset-bottom, 0px)); }
+@media (prefers-reduced-motion: reduce) { .card, .dots i { transition: none; } }
+
+.note svg { flex: none; width: 18px; height: 18px; }
+.note > span { flex: 1; min-width: 0; }
+.note button { flex: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="today" id="today"></div>
+      <h1>Was ist los in Chemnitz</h1>
+    </div>
+    <div class="head-actions">
+      <a class="round" href="index.html" aria-label="Alle Entwürfe" id="backLink"></a>
+      <button class="round" id="favBtn" aria-label="Merkliste öffnen"><span id="favIco"></span><span class="count" id="favCount" hidden></span></button>
+    </div>
+  </header>
+</div>
+
+<div class="tabs-bar">
+  <div class="wrap"><div class="tabs" id="tabs" role="tablist" aria-label="Kategorien"></div></div>
+</div>
+
+<main class="wrap" id="main"></main>
+
+<script src="gemeinsam.js"></script>
+<script>
+(function () {
+  const W = window.WILC, { esc, fmt, icon, fav } = W;
+  let tab = 'foryou';
+
+  document.getElementById('today').textContent = fmt.dateLong(W.TODAY);
+  document.getElementById('backLink').innerHTML = icon.chevronLeft;
+  document.getElementById('favBtn').onclick = () => W.openFavorites();
+
+  function renderTabs() {
+    const tabs = [{ id: 'foryou', name: 'Für dich' }].concat(W.CATEGORIES);
+    document.getElementById('tabs').innerHTML = tabs.map(t =>
+      `<button class="tab" role="tab" data-tab="${t.id}" aria-selected="${tab === t.id}">${t.color ? `<span class="w-dot" style="--c:${t.color}"></span>` : ''}${esc(t.name)}</button>`).join('');
+  }
+  document.getElementById('tabs').addEventListener('click', e => {
+    const b = e.target.closest('.tab'); if (!b) return;
+    tab = b.dataset.tab;
+    if (tab !== 'foryou') W.learn.track(tab, 1);
+    render();
+    b.scrollIntoView({ inline: 'nearest', block: 'nearest' });
+  });
+
+  const heart = (ev, cls) => {
+    const on = fav.has(ev.id);
+    return `<button class="w-heart ${cls || ''}" data-fav="${ev.id}" aria-pressed="${on}" aria-label="${on ? 'Von Merkliste entfernen' : 'Merken'}">${on ? icon.heartFill : icon.heart}</button>`;
+  };
+  function bigCard(ev, mid) {
+    const cat = W.catById(ev.cat);
+    return `<article class="card ${mid ? 'mid' : ''}" tabindex="0" data-id="${ev.id}" style="--c:${cat.color}">
+      <div class="big" aria-hidden="true">${ev.date.getDate()}</div>
+      <div class="eyebrow">${W.badge(ev)}<span>${esc(cat.name)}</span></div>
+      ${heart(ev, 'fav-top')}
+      <h3>${esc(ev.title)}</h3>
+      <div class="foot">
+        <div class="when"><strong>${fmt.relDay(ev)}, ${ev.time} Uhr</strong>${esc(ev.place)}</div>
+        ${mid ? '' : `<div class="btns"><button class="w-heart" data-share="${ev.id}" aria-label="Als Story teilen">${icon.share}</button></div>`}
+      </div>
+    </article>`;
+  }
+  function mini(ev) {
+    const cat = W.catById(ev.cat);
+    return `<article class="mini" tabindex="0" data-id="${ev.id}">
+      <div class="top"><span>${W.catDot(ev)}${esc(cat.name)}</span>${heart(ev)}</div>
+      <h4>${esc(ev.title)}</h4>
+      <p>${fmt.relDay(ev)}, ${ev.time} Uhr · ${esc(ev.place)}<br>${esc(ev.rhythmText)}</p>
+    </article>`;
+  }
+  const arrows = id => `<div class="arrows"><button class="round" data-scroll="${id}" data-dir="-1" aria-label="Zurück">${icon.chevronLeft}</button><button class="round" data-scroll="${id}" data-dir="1" aria-label="Weiter">${icon.chevron}</button></div>`;
+
+  function render() {
+    renderTabs();
+    const list = tab === 'foryou' ? W.EVENTS : W.EVENTS.filter(e => e.cat === tab);
+    const rare = W.rank(list.filter(e => e.rhythm === 'einmalig' || e.rhythm === 'selten'));
+    const yearly = W.rank(list.filter(e => e.rhythm === 'jaehrlich'));
+    const regular = W.rank(list.filter(e => e.rhythm === 'regelmaessig'));
+    const top = W.learn.top(3);
+    const note = tab !== 'foryou' ? '' : top.length
+      ? `<p class="note">${icon.sparkle}<span>Sortiert nach deinen Interessen: <strong>${top.map(c => esc(c.name)).join(', ')}</strong></span><button id="resetLearn">Zurücksetzen</button></p>`
+      : `<p class="note">${icon.sparkle}<span>Je mehr du antippst, desto besser passt „Für dich“.</span></p>`;
+
+    document.getElementById('main').innerHTML = `
+      ${note}
+      <section>
+        <div class="sec-head"><div><h2>Nur dieses eine Mal</h2><p class="sec-sub">Einmalig oder nur alle paar Jahre</p></div>${rare.length > 1 ? arrows('railRare') : ''}</div>
+        ${rare.length ? `<div class="rail" id="railRare">${rare.map(e => bigCard(e)).join('')}</div>
+          ${rare.length > 1 ? `<div class="dots" id="dotsRare" aria-hidden="true">${rare.map((_, i) => `<i class="${i === 0 ? 'on' : ''}"></i>`).join('')}</div>` : ''}`
+          : `<div class="empty">Diese Woche nichts Einmaliges in dieser Kategorie.</div>`}
+      </section>
+      <section>
+        <div class="sec-head"><div><h2>Einmal im Jahr</h2><p class="sec-sub">Feste Termine im Jahreskalender</p></div>${yearly.length > 1 ? arrows('railYear') : ''}</div>
+        ${yearly.length ? `<div class="rail" id="railYear">${yearly.map(e => bigCard(e, true)).join('')}</div>` : `<div class="empty">Diese Woche nichts Jährliches in dieser Kategorie.</div>`}
+      </section>
+      <section>
+        <div class="sec-head"><div><h2>Regelmäßig</h2><p class="sec-sub">Jede Woche oder jeden Monat</p></div>${regular.length > 1 ? arrows('railReg') : ''}</div>
+        ${regular.length ? `<div class="rail" id="railReg">${regular.map(mini).join('')}</div>` : `<div class="empty">Keine regelmäßigen Termine in dieser Kategorie.</div>`}
+      </section>
+      <footer>Entwurf 2 · Beispieldaten, alle Veranstaltungen sind erfunden</footer>`;
+
+    const railRare = document.getElementById('railRare'), dots = document.getElementById('dotsRare');
+    if (railRare && dots) railRare.addEventListener('scroll', () => {
+      const first = railRare.firstElementChild; if (!first) return;
+      const step = first.getBoundingClientRect().width + 14;
+      const i = Math.round(railRare.scrollLeft / step);
+      [...dots.children].forEach((d, k) => d.classList.toggle('on', k === Math.min(i, dots.children.length - 1)));
+    }, { passive: true });
+
+    const n = fav.count(), c = document.getElementById('favCount');
+    c.hidden = !n; c.textContent = n;
+    document.getElementById('favIco').innerHTML = n ? icon.heartFill : icon.heart;
+  }
+
+  const main = document.getElementById('main');
+  main.addEventListener('click', e => {
+    const f = e.target.closest('[data-fav]');
+    if (f) { fav.toggle(f.dataset.fav); return; }
+    const s = e.target.closest('[data-share]');
+    if (s) { W.openShare(W.EVENTS.find(x => x.id === s.dataset.share)); return; }
+    const a = e.target.closest('[data-scroll]');
+    if (a) { const r = document.getElementById(a.dataset.scroll); r.scrollBy({ left: a.dataset.dir * r.clientWidth * .8, behavior: 'smooth' }); return; }
+    if (e.target.id === 'resetLearn') { W.learn.reset(); return; }
+    const card = e.target.closest('[data-id]');
+    if (card) W.openDetail(W.EVENTS.find(x => x.id === card.dataset.id));
+  });
+  main.addEventListener('keydown', e => {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[data-id]')) { e.preventDefault(); e.target.click(); }
+  });
+
+  // Beim Neuzeichnen die Scroll-Position der Kartenreihen behalten
+  W.onChange(() => {
+    const pos = {}; document.querySelectorAll('.rail').forEach(r => pos[r.id] = r.scrollLeft);
+    render();
+    Object.entries(pos).forEach(([id, x]) => { const r = document.getElementById(id); if (r) r.scrollLeft = x; });
+  });
+  render();
+})();
+</script>
+</body>
+</html>

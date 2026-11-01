@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Chemnitz – Entwurf 3</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Entwurf 3 · Tagesansicht: Umschalter Heute/Morgen/Woche, Zeitleiste pro Tag, Merkliste als Seitenleiste (Desktop) bzw. Knopf unten (iPhone) */
+:root {
+  --bg: #F5F5F2;       /* leicht warmes Papierweiß */
+  --card: #FFFFFF;
+  --fg: #1B1C1E;
+  --fg2: #6D6F73;
+  --sep: rgba(40,40,50,.12);
+  --fill: rgba(110,112,120,.12);
+  --accent: #3D4BC7;   /* Indigo für Auswahl und Knöpfe */
+  --accent-soft: rgba(61,75,199,.10);
+  --on-accent: #FFFFFF;
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "Segoe UI", Roboto, Arial, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", "Segoe UI", Roboto, Arial, sans-serif;
+  --font-num: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0E0E10; --card: #1C1C1F; --fg: #F2F2F4; --fg2: #9C9DA3; --sep: rgba(255,255,255,.1); --fill: rgba(130,130,140,.22); --accent: #8B95FF; --accent-soft: rgba(139,149,255,.16); --on-accent: #0E0E10; color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --bg: #0E0E10; --card: #1C1C1F; --fg: #F2F2F4; --fg2: #9C9DA3; --sep: rgba(255,255,255,.1); --fill: rgba(130,130,140,.22); --accent: #8B95FF; --accent-soft: rgba(139,149,255,.16); --on-accent: #0E0E10; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 15px; -webkit-font-smoothing: antialiased; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.wrap { max-width: 1160px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.w-btn.primary { color: var(--on-accent); }
+
+header { padding-block: 16px 2px; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+h1 { font-family: var(--font-display); font-size: clamp(24px, 6.4vw, 30px); letter-spacing: -.02em; margin: 0; font-weight: 750; }
+.back { font-size: 14px; color: var(--accent); text-decoration: none; flex: none; }
+
+/* Steuerung (klebt oben) */
+.controls { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: color-mix(in srgb, var(--bg) 90%, transparent); backdrop-filter: saturate(180%) blur(18px); -webkit-backdrop-filter: saturate(180%) blur(18px); border-bottom: 1px solid var(--sep); }
+.controls .wrap { padding-block: 10px 0; }
+.seg { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--fill); border-radius: 11px; padding: 2px; max-width: 520px; }
+.seg button { appearance: none; border: 0; background: none; font: inherit; font-size: 14.5px; font-weight: 600; color: var(--fg); padding: 8px 6px; border-radius: 9px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--card); box-shadow: 0 1px 3px rgba(0,0,0,.12), 0 0 0 .5px var(--sep); }
+.seg button small { display: block; font-size: 11.5px; font-weight: 500; color: var(--fg2); }
+.chips { display: flex; gap: 6px; overflow-x: auto; padding-block: 10px; scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.chip { appearance: none; flex: none; font: inherit; font-size: 13.5px; font-weight: 550; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--sep); background: transparent; color: var(--fg); cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
+.chip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+.seg button:focus-visible, .chip:focus-visible, .ev:focus-visible, .fab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Layout: Inhalt + Merkliste */
+.layout { display: grid; gap: 28px; padding-block: 8px 0; }
+@media (min-width: 980px) { .layout { grid-template-columns: minmax(0, 1fr) 320px; } }
+.content { min-width: 0; }
+
+.learn { display: flex; gap: 6px; align-items: center; font-size: 13px; color: var(--fg2); margin: 12px 0 0; }
+.learn button { all: unset; color: var(--accent); cursor: pointer; }
+
+/* Tag */
+.day { margin-top: 22px; }
+.day-head { display: flex; align-items: baseline; gap: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--sep); }
+.day-head h2 { font-family: var(--font-display); font-size: 24px; letter-spacing: -.02em; margin: 0; }
+.day-head span { color: var(--fg2); font-size: 15px; }
+.day-head .n { margin-left: auto; font-size: 13px; }
+.label { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--fg2); margin: 16px 0 8px; display: flex; gap: 6px; align-items: center; }
+.label svg { width: 16px; height: 16px; }
+
+/* Veranstaltung: Zeit links, Inhalt rechts */
+.ev { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: 12px; align-items: start; padding: 12px 4px 12px 0; cursor: pointer; border-radius: 12px; }
+.ev + .ev { border-top: 1px solid var(--sep); }
+.ev .time { font-family: var(--font-num); font-variant-numeric: tabular-nums; font-weight: 650; font-size: 15px; padding-top: 1px; padding-left: 4px; }
+.ev .time small { display: block; font-size: 12px; font-weight: 500; color: var(--fg2); }
+.ev .t { font-size: 16px; font-weight: 600; line-height: 1.25; }
+.ev .m { font-size: 13.5px; color: var(--fg2); margin-top: 3px; line-height: 1.35; }
+.ev .tags { margin-top: 7px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 12.5px; color: var(--fg2); }
+.ev .tags span.c { display: inline-flex; gap: 5px; align-items: center; }
+.ev .w-heart { margin-top: -8px; }
+
+/* Besonderes: hervorgehobene Karte mit farbiger Kante links */
+.special { background: var(--card); border-radius: 16px; padding: 4px 6px 4px 12px; box-shadow: 0 1px 2px rgba(0,0,0,.04); display: grid; gap: 8px; }
+.special .ev { position: relative; }
+.special .ev .t { font-size: 17.5px; letter-spacing: -.01em; }
+.special .ev .stripe { position: absolute; left: -12px; top: 14px; bottom: 14px; width: 4px; border-radius: 0 4px 4px 0; background: var(--c); }
+.regular .ev .t { font-weight: 550; font-size: 15.5px; }
+.regular .ev .tags { display: none; }
+.regular .ev .m .rt { color: var(--fg2); }
+
+details.reg-more summary { list-style: none; cursor: pointer; }
+details.reg-more summary::-webkit-details-marker { display: none; }
+.empty { color: var(--fg2); font-size: 14.5px; padding: 14px 0; }
+
+/* Merkliste: Desktop-Seitenleiste */
+aside.side { display: none; }
+@media (min-width: 980px) {
+  aside.side { display: block; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 130px); align-self: start; background: var(--card); border-radius: 18px; padding: 16px; max-height: calc(100vh - 150px); overflow: auto; margin-top: 22px; }
+  .fab { display: none !important; }
+}
+aside.side h2 { font-size: 18px; margin: 0; display: flex; gap: 8px; align-items: center; }
+aside.side h2 svg { color: var(--r-once); }
+aside.side .sub { font-size: 12.5px; color: var(--fg2); margin: 4px 0 6px; }
+
+/* Merkliste: Knopf unten (iPhone) */
+.fab { position: fixed; z-index: 20; left: 50%; transform: translateX(-50%); bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  appearance: none; border: 0; border-radius: 999px; padding: 12px 20px 12px 16px; font: inherit; font-size: 15px; font-weight: 650;
+  background: var(--fg); color: var(--bg); display: inline-flex; align-items: center; gap: 8px; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,.25); white-space: nowrap; }
+.fab .n { background: var(--r-once); color: #fff; border-radius: 999px; min-width: 22px; height: 22px; display: grid; place-items: center; font-size: 12.5px; padding: 0 6px; }
+.fab.bump { animation: bump .35s ease; }
+@keyframes bump { 50% { transform: translateX(-50%) scale(1.08); } }
+@media (prefers-reduced-motion: reduce) { .fab.bump { animation: none; } }
+footer { color: var(--fg2); font-size: 12.5px; text-align: center; padding-block: 34px calc(100px + env(safe-area-inset-bottom, 0px)); }
+
+.learn svg { flex: none; width: 18px; height: 18px; }
+.learn > span { flex: 1; min-width: 0; }
+.learn button { flex: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Was ist los in Chemnitz</h1>
+    <a class="back" href="index.html">Alle Entwürfe</a>
+  </header>
+</div>
+
+<div class="controls">
+  <div class="wrap">
+    <div class="seg" id="seg" role="group" aria-label="Zeitraum"></div>
+    <div class="chips" id="chips" role="group" aria-label="Kategorien filtern"></div>
+  </div>
+</div>
+
+<div class="wrap layout">
+  <main class="content" id="main"></main>
+  <aside class="side" id="side" aria-label="Merkliste"></aside>
+</div>
+
+<button class="fab" id="fab" aria-label="Merkliste öffnen"></button>
+
+<script src="gemeinsam.js"></script>
+<script>
+(function () {
+  const W = window.WILC, { esc, fmt, icon, fav } = W;
+  let period = 'today';
+  const selected = new Set();
+
+  const PERIODS = [
+    { id: 'today', name: 'Heute',       sub: () => `${fmt.weekdayShort(W.TODAY)}, ${fmt.dateShort(W.TODAY)}`, days: [0] },
+    { id: 'tomorrow', name: 'Morgen',   sub: () => { const d = new Date(W.TODAY); d.setDate(d.getDate() + 1); return `${fmt.weekdayShort(d)}, ${fmt.dateShort(d)}`; }, days: [1] },
+    { id: 'week', name: 'Diese Woche',  sub: () => 'Die nächsten 7 Tage', days: [0, 1, 2, 3, 4, 5, 6, 7] }
+  ];
+
+  function renderControls() {
+    document.getElementById('seg').innerHTML = PERIODS.map(p =>
+      `<button data-p="${p.id}" aria-pressed="${period === p.id}">${p.name}<small>${p.sub()}</small></button>`).join('');
+    document.getElementById('chips').innerHTML = `<button class="chip" data-cat="" aria-pressed="${selected.size === 0}">Alle</button>` +
+      W.CATEGORIES.map(c => `<button class="chip" data-cat="${c.id}" aria-pressed="${selected.has(c.id)}"><span class="w-dot" style="--c:${c.color}"></span>${esc(c.name)}</button>`).join('');
+  }
+  document.getElementById('seg').addEventListener('click', e => {
+    const b = e.target.closest('[data-p]'); if (!b) return;
+    period = b.dataset.p; render(); window.scrollTo({ top: 0 });
+  });
+  document.getElementById('chips').addEventListener('click', e => {
+    const b = e.target.closest('.chip'); if (!b) return;
+    const id = b.dataset.cat;
+    if (!id) selected.clear();
+    else if (selected.has(id)) selected.delete(id);
+    else { selected.add(id); W.learn.track(id, 1); }
+    render();
+  });
+
+  const heart = ev => {
+    const on = fav.has(ev.id);
+    return `<button class="w-heart" data-fav="${ev.id}" aria-pressed="${on}" aria-label="${on ? 'Von Merkliste entfernen' : 'Merken'}">${on ? icon.heartFill : icon.heart}</button>`;
+  };
+  function evRow(ev, special) {
+    const cat = W.catById(ev.cat);
+    return `<div class="ev" role="button" tabindex="0" data-id="${ev.id}" style="--c:${cat.color}">
+      ${special ? '<span class="stripe"></span>' : ''}
+      <div class="time">${ev.time}<small>${ev.end}</small></div>
+      <div>
+        <div class="t">${esc(ev.title)}</div>
+        <div class="m">${esc(ev.place)}${special ? '' : ` · <span class="rt">${esc(ev.rhythmText)}</span>`}</div>
+        <div class="tags">${W.badge(ev)}<span class="c">${W.catDot(ev)}${esc(cat.name)}</span><span>${esc(ev.rhythmText)}</span></div>
+      </div>
+      ${heart(ev)}
+    </div>`;
+  }
+
+  function dayBlock(day, events) {
+    const d = new Date(W.TODAY); d.setDate(d.getDate() + day);
+    const name = day === 0 ? 'Heute' : day === 1 ? 'Morgen' : fmt.weekday(d);
+    const special = W.rank(events.filter(W.isRare));
+    const regular = W.byTime(events.filter(e => !W.isRare(e)));
+    return `<section class="day">
+      <div class="day-head"><h2>${name}</h2><span>${d.getDate()}. ${fmt.monthShort(d)}</span><span class="n">${events.length} ${events.length === 1 ? 'Termin' : 'Termine'}</span></div>
+      ${special.length ? `<div class="label">${icon.sparkle}Besonders</div><div class="special">${special.map(e => evRow(e, true)).join('')}</div>` : ''}
+      ${regular.length ? `<div class="label">${icon.repeat}Regelmäßig</div><div class="regular">${regular.map(e => evRow(e)).join('')}</div>` : ''}
+      ${!events.length ? `<p class="empty">Keine Termine in dieser Auswahl.</p>` : ''}
+    </section>`;
+  }
+
+  function renderMain() {
+    const p = PERIODS.find(x => x.id === period);
+    const list = W.EVENTS.filter(e => p.days.includes(e.day) && (selected.size === 0 || selected.has(e.cat)));
+    const top = W.learn.top(3);
+    const note = top.length
+      ? `<p class="learn">${icon.sparkle}<span>Bei „Besonders“ weiter oben: <strong>${top.map(c => esc(c.name)).join(', ')}</strong></span><button id="resetLearn">Zurücksetzen</button></p>`
+      : `<p class="learn">${icon.sparkle}<span>Die Seite merkt sich deine Lieblingskategorien und sortiert danach.</span></p>`;
+    let days = p.days;
+    if (period === 'week') days = days.filter(d => list.some(e => e.day === d));
+    document.getElementById('main').innerHTML = note +
+      (days.length ? days.map(d => dayBlock(d, list.filter(e => e.day === d))).join('') : `<p class="empty">Keine Termine in dieser Auswahl.</p>`) +
+      `<footer>Entwurf 3 · Beispieldaten, alle Veranstaltungen sind erfunden</footer>`;
+  }
+
+  function renderSide() {
+    const list = fav.list();
+    document.getElementById('side').innerHTML = `
+      <h2>${icon.heartFill}Merkliste</h2>
+      <p class="sub">Nur auf diesem Gerät gespeichert</p>
+      ${list.length ? `<ul class="w-favlist">${list.map(ev => `
+        <li>${W.catDot(ev)}<button class="w-open" data-id="${ev.id}"><b>${esc(ev.title)}</b><span class="s">${fmt.when(ev)} · ${esc(ev.place)}</span></button>
+        <button class="w-heart" data-fav="${ev.id}" aria-pressed="true" aria-label="Von Merkliste entfernen">${icon.heartFill}</button></li>`).join('')}</ul>`
+      : `<p class="w-empty">Noch nichts gemerkt.<br>Tippe auf ein Herz – es landet sofort hier.</p>`}`;
+    const fab = document.getElementById('fab');
+    const n = fav.count();
+    fab.innerHTML = `${n ? icon.heartFill : icon.heart}Merkliste${n ? `<span class="n">${n}</span>` : ''}`;
+  }
+
+  let lastCount = fav.count();
+  function render() {
+    renderControls(); renderMain(); renderSide();
+    const n = fav.count();
+    if (n > lastCount) { const f = document.getElementById('fab'); f.classList.remove('bump'); void f.offsetWidth; f.classList.add('bump'); }
+    lastCount = n;
+  }
+
+  function onClick(e) {
+    const f = e.target.closest('[data-fav]');
+    if (f) { fav.toggle(f.dataset.fav); return; }
+    if (e.target.id === 'resetLearn') { W.learn.reset(); return; }
+    const r = e.target.closest('[data-id]');
+    if (r) W.openDetail(W.EVENTS.find(x => x.id === r.dataset.id));
+  }
+  document.getElementById('main').addEventListener('click', onClick);
+  document.getElementById('side').addEventListener('click', onClick);
+  document.getElementById('main').addEventListener('keydown', e => {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[data-id]')) { e.preventDefault(); e.target.click(); }
+  });
+  document.getElementById('fab').onclick = () => W.openFavorites();
+
+  W.onChange(render);
+  render();
+})();
+</script>
+</body>
+</html>

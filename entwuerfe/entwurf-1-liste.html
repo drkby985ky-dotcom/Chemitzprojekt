@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Chemnitz – Entwurf 1</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Entwurf 1 · Ruhige Liste: großer Highlight-Bereich oben, darunter gruppierte Listen im iOS-Stil */
+:root {
+  --bg: #F2F2F7;       /* Seitenhintergrund (iOS gruppiert) */
+  --card: #FFFFFF;     /* Karten und Listen */
+  --fg: #1C1C1E;       /* Text */
+  --fg2: #6E6E76;      /* Nebentext */
+  --sep: rgba(60,60,67,.16);
+  --fill: rgba(118,118,128,.12);
+  --accent: #0066CC;
+  --hero-fg: #FFFFFF;
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "Segoe UI", Roboto, Arial, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", "Segoe UI", Roboto, Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #000000; --card: #1C1C1E; --fg: #F2F2F7; --fg2: #9A9AA1; --sep: rgba(84,84,88,.55); --fill: rgba(118,118,128,.26); --accent: #3B9BFF; color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --bg: #000000; --card: #1C1C1E; --fg: #F2F2F7; --fg2: #9A9AA1; --sep: rgba(84,84,88,.55); --fill: rgba(118,118,128,.26); --accent: #3B9BFF; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 15px; -webkit-font-smoothing: antialiased; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.wrap { max-width: 980px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* Kopf */
+header { padding-block: 18px 6px; }
+.top-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.today { font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--fg2); }
+.back { font-size: 14px; color: var(--accent); text-decoration: none; }
+h1 { font-family: var(--font-display); font-size: clamp(30px, 8vw, 40px); line-height: 1.08; letter-spacing: -.025em; margin: 6px 0 0; font-weight: 750; text-wrap: balance; }
+
+/* Filter */
+.filters { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: saturate(180%) blur(18px); -webkit-backdrop-filter: saturate(180%) blur(18px); }
+.chips { display: flex; gap: 8px; overflow-x: auto; padding-block: 12px; scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.chip { appearance: none; border: 0; flex: none; font: inherit; font-size: 14.5px; font-weight: 550; padding: 8px 14px; border-radius: 999px; background: var(--card); color: var(--fg); cursor: pointer; display: inline-flex; align-items: center; gap: 7px; box-shadow: 0 0 0 1px var(--sep) inset; }
+.chip[aria-pressed="true"] { background: var(--fg); color: var(--bg); box-shadow: none; }
+.chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.learn { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--fg2); margin: 2px 0 6px; }
+.learn button { all: unset; color: var(--accent); cursor: pointer; }
+
+/* Abschnitte */
+section { margin-top: 22px; }
+.sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+h2 { font-family: var(--font-display); font-size: 22px; letter-spacing: -.015em; margin: 0; }
+.sec-sub { font-size: 13.5px; color: var(--fg2); margin: 2px 0 0; }
+
+/* Highlight */
+.hl-grid { display: grid; gap: 12px; }
+@media (min-width: 760px) { .hl-grid { grid-template-columns: 1.25fr 1fr; align-items: start; } }
+.hero { position: relative; border-radius: 22px; overflow: hidden; color: var(--hero-fg); padding: 22px; min-height: 300px; display: flex; flex-direction: column; justify-content: flex-end; cursor: pointer;
+  background: radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, var(--c) 70%, white) 0%, transparent 55%), linear-gradient(160deg, var(--c), color-mix(in srgb, var(--c) 45%, black)); }
+.hero .eyebrow { position: absolute; top: 20px; left: 22px; right: 70px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 12.5px; font-weight: 650; letter-spacing: .05em; text-transform: uppercase; opacity: .92; }
+.hero .w-badge { background: #fff; color: color-mix(in srgb, var(--c) 70%, black); }
+.hero h3 { font-family: var(--font-display); font-size: clamp(26px, 7vw, 34px); line-height: 1.08; letter-spacing: -.02em; margin: 0 0 10px; text-wrap: balance; }
+.hero p { margin: 0; font-size: 15px; opacity: .9; line-height: 1.4; }
+.hero .w-heart { position: absolute; top: 12px; right: 12px; color: #fff; background: rgba(255,255,255,.18); }
+.hero .w-heart[aria-pressed="true"] { color: #fff; background: rgba(255,255,255,.34); }
+.hero:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+
+/* Listen (iOS "inset grouped") */
+.group { background: var(--card); border-radius: 16px; overflow: hidden; }
+.row { display: flex; align-items: center; gap: 14px; padding: 12px 6px 12px 14px; position: relative; cursor: pointer; }
+.row + .row::before { content: ""; position: absolute; top: 0; left: 76px; right: 0; height: 1px; background: var(--sep); }
+.row:hover { background: color-mix(in srgb, var(--fill) 50%, transparent); }
+.row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.date { width: 48px; flex: none; text-align: center; border-radius: 12px; padding: 6px 0; background: var(--fill); font-variant-numeric: tabular-nums; }
+.date small { display: block; font-size: 11px; font-weight: 650; text-transform: uppercase; letter-spacing: .04em; color: var(--fg2); }
+.date b { display: block; font-size: 20px; line-height: 1.1; }
+.date.is-today { background: var(--accent); color: #fff; }
+.date.is-today small { color: rgba(255,255,255,.85); }
+.info { flex: 1; min-width: 0; }
+.info .t { font-size: 16px; font-weight: 600; line-height: 1.25; }
+.info .m { font-size: 13.5px; color: var(--fg2); margin-top: 3px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.info .tags { margin-top: 6px; display: flex; gap: 6px; flex-wrap: wrap; }
+
+.empty { background: var(--card); border-radius: 16px; padding: 22px; color: var(--fg2); text-align: center; line-height: 1.5; }
+
+/* Tab-Leiste unten */
+.tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: flex; justify-content: center; gap: 4px;
+  padding: 6px max(16px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  background: color-mix(in srgb, var(--card) 85%, transparent); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-top: 1px solid var(--sep); }
+.tab { appearance: none; border: 0; background: none; font: inherit; color: var(--fg2); display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; font-weight: 600; padding: 4px 28px; cursor: pointer; position: relative; }
+.tab[aria-current="page"] { color: var(--accent); }
+.tab .count { position: absolute; top: 0; right: 18px; background: var(--r-once); color: #fff; font-size: 11px; min-width: 18px; height: 18px; border-radius: 9px; display: grid; place-items: center; padding: 0 5px; }
+main { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
+footer { color: var(--fg2); font-size: 12.5px; text-align: center; margin: 30px 0 0; }
+
+.learn svg { flex: none; width: 18px; height: 18px; }
+.learn > span { flex: 1; min-width: 0; }
+.learn button { flex: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="top-row">
+      <span class="today" id="today"></span>
+      <a class="back" href="index.html">Alle Entwürfe</a>
+    </div>
+    <h1 id="title">Was ist los in Chemnitz</h1>
+  </header>
+</div>
+
+<div class="filters" id="filterBar">
+  <div class="wrap"><div class="chips" id="chips" role="group" aria-label="Kategorien filtern"></div></div>
+</div>
+
+<main class="wrap" id="main"></main>
+
+<nav class="tabbar" aria-label="Ansicht">
+  <button class="tab" id="tabDiscover" aria-current="page"><span id="icoDiscover"></span>Entdecken</button>
+  <button class="tab" id="tabFav"><span id="icoFav"></span>Merkliste<span class="count" id="favCount" hidden></span></button>
+</nav>
+
+<script src="gemeinsam.js"></script>
+<script>
+(function () {
+  const W = window.WILC, { esc, fmt, icon, fav } = W;
+  let selected = new Set();   // gewählte Kategorien (leer = alle)
+  let view = 'discover';
+
+  document.getElementById('today').textContent = fmt.dateLong(W.TODAY);
+  document.getElementById('icoDiscover').innerHTML = icon.sparkle;
+
+  /* Filter-Chips */
+  function renderChips() {
+    const chips = document.getElementById('chips');
+    chips.innerHTML = `<button class="chip" data-cat="" aria-pressed="${selected.size === 0}">Alle</button>` +
+      W.CATEGORIES.map(c => `<button class="chip" data-cat="${c.id}" aria-pressed="${selected.has(c.id)}"><span class="w-dot" style="--c:${c.color}"></span>${esc(c.name)}</button>`).join('');
+  }
+  document.getElementById('chips').addEventListener('click', e => {
+    const b = e.target.closest('.chip'); if (!b) return;
+    const id = b.dataset.cat;
+    if (!id) selected.clear();
+    else if (selected.has(id)) selected.delete(id);
+    else { selected.add(id); W.learn.track(id, 1); }
+    render();
+  });
+
+  const visible = () => W.EVENTS.filter(e => selected.size === 0 || selected.has(e.cat));
+
+  function heartBtn(ev) {
+    const on = fav.has(ev.id);
+    return `<button class="w-heart" data-fav="${ev.id}" aria-pressed="${on}" aria-label="${on ? 'Von Merkliste entfernen' : 'Merken'}">${on ? icon.heartFill : icon.heart}</button>`;
+  }
+  function row(ev) {
+    const cat = W.catById(ev.cat);
+    return `<div class="row" role="button" tabindex="0" data-id="${ev.id}">
+      <div class="date ${ev.day === 0 ? 'is-today' : ''}"><small>${ev.day === 0 ? 'Heute' : fmt.weekdayShort(ev.date)}</small><b>${ev.date.getDate()}</b></div>
+      <div class="info">
+        <div class="t">${esc(ev.title)}</div>
+        <div class="m">${ev.time} Uhr · ${esc(ev.place)}</div>
+        <div class="tags">${W.badge(ev)}<span class="m" style="margin:0">${W.catDot(ev)}${esc(cat.name)}</span></div>
+      </div>
+      ${heartBtn(ev)}
+    </div>`;
+  }
+  function hero(ev) {
+    const cat = W.catById(ev.cat);
+    return `<article class="hero" role="button" tabindex="0" data-id="${ev.id}" style="--c:${cat.color}">
+      <div class="eyebrow">${W.badge(ev)}<span>${esc(cat.name)}</span></div>
+      ${heartBtn(ev)}
+      <h3>${esc(ev.title)}</h3>
+      <p><strong>${fmt.when(ev)}</strong><br>${esc(ev.place)} · ${esc(ev.rhythmText)}</p>
+    </article>`;
+  }
+
+  function learnNote() {
+    const top = W.learn.top(3);
+    if (!top.length) return `<p class="learn">${icon.sparkle}<span>Die Seite merkt sich, was dich interessiert, und sortiert passend.</span></p>`;
+    return `<p class="learn">${icon.sparkle}<span>Weiter oben, weil du dich dafür interessierst: <strong>${top.map(c => esc(c.name)).join(', ')}</strong></span><button id="resetLearn">Zurücksetzen</button></p>`;
+  }
+
+  function renderDiscover() {
+    const list = visible();
+    const rare = W.rank(list.filter(W.isRare));
+    const regular = W.rank(list.filter(e => !W.isRare(e)));
+    const [top, ...rest] = rare;
+    return `
+      ${learnNote()}
+      <section>
+        <div class="sec-head"><div><h2>Selten und besonders</h2><p class="sec-sub">Einmalig, alle paar Jahre oder nur einmal im Jahr</p></div></div>
+        ${top ? `<div class="hl-grid">${hero(top)}<div class="group">${rest.map(row).join('')}</div></div>`
+              : `<div class="empty">In dieser Auswahl gibt es diese Woche nichts Seltenes.</div>`}
+      </section>
+      <section>
+        <div class="sec-head"><div><h2>Regelmäßig</h2><p class="sec-sub">Jede Woche oder jeden Monat</p></div></div>
+        ${regular.length ? `<div class="group">${regular.map(row).join('')}</div>` : `<div class="empty">Keine regelmäßigen Termine in dieser Auswahl.</div>`}
+      </section>
+      <footer>Entwurf 1 · Beispieldaten, alle Veranstaltungen sind erfunden</footer>`;
+  }
+  function renderFav() {
+    const list = fav.list();
+    return `
+      <section>
+        <div class="sec-head"><div><h2>Merkliste</h2><p class="sec-sub">Wird nur auf diesem Gerät gespeichert</p></div></div>
+        ${list.length ? `<div class="group">${list.map(row).join('')}</div>` : `<div class="empty">Noch nichts gemerkt.<br>Tippe bei einer Veranstaltung auf das Herz.</div>`}
+      </section>`;
+  }
+
+  function render() {
+    renderChips();
+    document.getElementById('filterBar').hidden = view !== 'discover';
+    document.getElementById('main').innerHTML = view === 'discover' ? renderDiscover() : renderFav();
+    const n = fav.count(), badge = document.getElementById('favCount');
+    badge.hidden = !n; badge.textContent = n;
+    document.getElementById('icoFav').innerHTML = view === 'fav' ? icon.heartFill : icon.heart;
+    document.getElementById('tabDiscover').setAttribute('aria-current', view === 'discover' ? 'page' : 'false');
+    document.getElementById('tabFav').setAttribute('aria-current', view === 'fav' ? 'page' : 'false');
+  }
+
+  const main = document.getElementById('main');
+  main.addEventListener('click', e => {
+    const f = e.target.closest('[data-fav]');
+    if (f) { e.stopPropagation(); fav.toggle(f.dataset.fav); return; }
+    if (e.target.id === 'resetLearn') { W.learn.reset(); return; }
+    const r = e.target.closest('[data-id]');
+    if (r) W.openDetail(W.EVENTS.find(x => x.id === r.dataset.id));
+  });
+  main.addEventListener('keydown', e => {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[data-id]')) { e.preventDefault(); e.target.click(); }
+  });
+  document.getElementById('tabDiscover').onclick = () => { view = 'discover'; render(); scrollTo(0, 0); };
+  document.getElementById('tabFav').onclick = () => { view = 'fav'; render(); scrollTo(0, 0); };
+
+  W.onChange(render);
+  render();
+})();
+</script>
+</body>
+</html>
