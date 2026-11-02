@@ -25,7 +25,7 @@ Die Seite selbst nutzt die verkleinerten Dateien aus `entwuerfe/medien/`.
 **gunzenhauser:** Bright modern museum foyer with clean white walls, large abstract paintings in soft focus, warm daylight through tall windows, light patterns slowly moving across a polished floor, calm and minimal atmosphere. Slow gentle camera glide forward. No recognizable faces, no text, no logos, no signs, no readable captions, no sound. Seamless loop feeling.
 
 **karl-marx:** Keep the monument exactly as in the reference photos, same shape and proportions. Scene at night, the monument is lit by a moving light projection: colorful light in blue, violet and orange flows and drifts slowly across its surface like moving ink, with soft slow animated patterns and gentle color changes, soft glow on the pavement. Very slow camera push-in. No new text, no logos, no sound. Seamless loop feeling.
-Eigene Fotos (unbeschnitten): `entwuerfe/medien/karl-marx-tag.jpg`, `entwuerfe/medien/karl-marx-nacht.jpg`. Zugeschnittene Fassungen im Ordner `karl-marx/`.
+Eigene Fotos (unbeschnitten) und zugeschnittene Fassungen: Ordner `karl-marx/` (`foto-tag.jpg`, `foto-nacht.jpg`).
 
 ## Verkleinern
 

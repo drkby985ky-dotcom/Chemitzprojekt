@@ -574,7 +574,7 @@ footer a { color: var(--fg); }
   const lazy = new IntersectionObserver(list => list.forEach(x => {
     if (!x.isIntersecting) return;
     lazy.unobserve(x.target);
-    x.target.querySelectorAll('[data-cover]').forEach(el => { const k = el.tagName === 'VIDEO' ? 'poster' : 'src'; if (!el[k]) el[k] = cover(el.dataset.cover); });
+    x.target.querySelectorAll('[data-cover]').forEach(el => { if (!el.src) el.src = cover(el.dataset.cover); });
   }), { rootMargin: '400px 0px' });
   function cover(key) {
     if (coverCache[key]) return coverCache[key];
@@ -592,7 +592,7 @@ footer a { color: var(--fg); }
   };
   function card(ev, size) {
     const dateLine = `${ev.rhythm === 'regelmaessig' ? esc(ev.rhythmText) : shortDate(ev)} · ${hm(ev.time)} Uhr`;
-    const media = ev.video ? `<video data-cover="${ev.cover}" data-video="${esc(ev.video)}" muted loop playsinline preload="none"></video>`
+    const media = ev.video ? `<video poster="${esc(ev.video.replace(/\.mp4$/, '.jpg'))}" data-video="${esc(ev.video)}" muted loop playsinline preload="none"></video>`
       : `<img data-cover="${ev.cover}" ${ev.webp ? `data-webp="${esc(ev.webp)}"` : ''} alt="">`;
     return `<article class="card ${size}" data-id="${ev.id}" tabindex="0" aria-label="${esc(ev.title)}">
       <div class="cv">${media}
@@ -643,16 +643,31 @@ footer a { color: var(--fg); }
       .sort((a, b) => !!b.video - !!a.video);   // Karten mit Video zuerst
     heroRail.innerHTML = list.length ? list.map(e => card(e, 'lg')).join('') : `<p class="empty">Keine besonderen Termine in den gewählten Kategorien.</p>`;
     heroRail.scrollLeft = 0;
-    live.disconnect();
-    if (!reduced) heroRail.querySelectorAll('.card').forEach(c => live.observe(c));
+    live.disconnect(); near.disconnect();
+    if (!reduced) heroRail.querySelectorAll('.card').forEach(c => { live.observe(c); near.observe(c); });
   }
-  // Nur ganz sichtbare Karten bewegen sich: Video läuft, WebP wird geladen, sonst Zoom.
-  const live = new IntersectionObserver(list => list.forEach(({ target: c, isIntersecting: on }) => {
-    c.classList.toggle('live', on);
-    const v = c.querySelector('video'), w = c.querySelector('[data-webp]');
-    if (v) { if (on) { if (!v.src) v.src = v.dataset.video; v.play().catch(() => {}); } else v.pause(); }
-    if (w) w.src = on ? w.dataset.webp : cover(w.dataset.cover);
-  }), { threshold: .9 });
+  // Videos laden, sobald ihre Karte im Karussell zu sehen oder angeschnitten ist: die ersten gleich beim Öffnen, die nächste kurz vorher.
+  const near = new IntersectionObserver(list => list.forEach(x => {
+    const v = x.target.querySelector('video');
+    if (x.isIntersecting && v && !v.src) { v.preload = 'auto'; v.src = v.dataset.video; }
+  }), { root: document.getElementById('heroRail') });
+  // Nur ganz sichtbare Karten bewegen sich: WebP wird geladen, sonst Zoom; von den Videos spielt nur das vorderste.
+  const live = new IntersectionObserver(list => {
+    list.forEach(({ target: c, isIntersecting: on }) => {
+      c.classList.toggle('live', on);
+      const w = c.querySelector('[data-webp]');
+      if (w) w.src = on ? w.dataset.webp : cover(w.dataset.cover);
+    });
+    let first = true;
+    heroRail.querySelectorAll('video').forEach(v => {
+      if (first && v.closest('.live')) {
+        first = false;
+        if (!v.src) v.src = v.dataset.video;
+        v.muted = true; v.playsInline = true;   // für Safari ausdrücklich stumm, sonst startet es erst nach Berührung
+        v.play().catch(() => {});
+      } else v.pause();
+    });
+  }, { threshold: .9 });
 
   // Tagesleiste wie ein Kalender: obere Zeile alle Tage eines Monats, untere Zeile Monat und Jahr wählen.
   // Alles aus dem Gerätedatum berechnet. Monate werden ab Januar des laufenden Jahres gezählt (12 = Januar im nächsten Jahr).
