@@ -305,7 +305,10 @@ footer a { color: var(--fg); }
   //   webp:  animiertes WebP, ca. 480 × 600 Pixel, möglichst unter 400 KB
   // Reihenfolge: Video, sonst animiertes Bild, sonst normales Bild mit sanftem Zoom.
   // Beispiel: a03: { video: 'medien/orgelnacht.mp4', webp: 'medien/orgelnacht.webp' }
-  const MEDIA = { a13: { video: 'medien/konzert.mp4' } };   // Clubnacht: erstes echtes Test-Video (480 × 640, 4 s, 140 KB)
+  const MEDIA = {   // Originale und Entstehung: Ordner medien-archiv im Projekt
+    a13: { video: 'medien/konzert.mp4' },           // Clubnacht (480 × 640, 4 s, 141 KB)
+    a07: { video: 'medien/stadtbibliothek.mp4' }    // Vortrag in der Stadtbibliothek (480 × 640, 4 s, 285 KB)
+  };
 
   // Besondere Termine: [id, Tage ab heute, Beginn, Ende, Kategorie, Merkmal, Rhythmus-Text, Titel, Ort, Stadtteil, Preis, Beschreibung]
   const SPECIAL = [
