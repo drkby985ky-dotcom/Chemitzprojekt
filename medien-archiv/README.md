@@ -6,7 +6,8 @@ Die Seite selbst nutzt die verkleinerten Dateien aus `entwuerfe/medien/`.
 | Ordner | Veranstaltung | Herkunft | Original | Klein (auf der Seite) |
 |---|---|---|---|---|
 | `konzert/` | (nicht mehr auf der Seite, ersetzt durch `atomino/`) | Video aus dem Chat (Higgsfield) | 834 × 1112, 4 s, 1,8 MB | 480 × 640, 4 s, ohne Ton, 141 KB |
-| `atomino/` | Clubnacht mit Gästen aus Tokio (Atomino), ersetzt `konzert/` | Higgsfield, Seedance 2.0 Mini, 3:4, 480p, 4 s, ohne Ton, 2 Credits, 2.11.2026 | 560 × 752, 4 s, 1,2 MB | 480 × 640, 292 KB |
+| `atomino/` | (nicht mehr auf der Seite, ersetzt durch `atomino-2/`) | Higgsfield, Seedance 2.0 Mini, 3:4, 480p, 4 s, ohne Ton, 2 Credits, 2.11.2026 | 560 × 752, 4 s, 1,2 MB | 480 × 640, 292 KB |
+| `atomino-2/` | Clubnacht mit Gästen aus Tokio (Atomino), ersetzt `atomino/` | Higgsfield, Seedance 2.0 Mini, 3:4, 480p, 4 s, ohne Ton, 2 Credits, 2.11.2026 | 560 × 752, 4 s, 1,3 MB | 480 × 640, 296 KB |
 | `weber/` | Premiere: Die Weber von Chemnitz (Schauspielhaus) | Higgsfield, wie oben, 2 Credits, 2.11.2026 | 560 × 752, 4 s, 1,1 MB | 480 × 640, 189 KB |
 | `gunzenhauser/` | Lange Nacht im Gunzenhauser | Higgsfield, wie oben, 2 Credits, 2.11.2026 | 560 × 752, 4 s, 1,0 MB | 480 × 640, 171 KB |
 | `karl-marx/` | Lichtprojektion am Karl-Marx-Kopf | Higgsfield, wie oben, mit eigenen Fotos: Startbild = Tagesfoto (zugeschnitten), Referenz = Nachtfoto (zugeschnitten, ohne Plakat), 2 Credits, 2.11.2026 | 560 × 752, 4 s, 1,7 MB | 480 × 640, 234 KB |
@@ -19,6 +20,8 @@ Die Seite selbst nutzt die verkleinerten Dateien aus `entwuerfe/medien/`.
 ## Prompts der Videos vom 2.11.2026
 
 **atomino:** Dark nightclub dance floor seen from behind the crowd, silhouettes of people with raised hands, no faces visible, pulsing neon lights in magenta and cyan, haze and slow moving light beams, subtle laser lines. Slow camera push-in. Seamless loop feeling, no text, no logos, no signs, no sound.
+
+**atomino-2:** Handheld smartphone-style footage inside a dark nightclub, shot from within the crowd. Slight natural camera shake and small hand-held movements, as if a person is filming while dancing. People dance energetically and naturally with realistic body movement: arms in the air, bouncing to the beat, swaying, turning heads. They are seen from behind or as silhouettes against the lights, no clearly visible faces. Same look as before: pulsing neon lights in magenta and cyan, haze, slow moving light beams, subtle laser lines. Shallow depth of field, realistic motion blur, authentic party atmosphere. No text, no logos, no signs, no sound. Seamless loop feeling.
 
 **weber:** Empty theater stage with a heavy dark red velvet curtain slowly moving, warm spotlight cone from above, wooden stage floor, dust particles floating in the light, rows of empty red theater seats in soft focus in the foreground. Slow camera push-in toward the stage. No people, no text, no logos, no signs, no sound. Seamless loop feeling.
 
