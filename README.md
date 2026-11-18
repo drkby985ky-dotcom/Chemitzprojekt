@@ -16,3 +16,15 @@ Webseite mit Highlights in Chemnitz – seltene und einmalige Veranstaltungen zu
 Öffnen: `entwuerfe/index.html` im Browser doppelklicken. Alle Daten sind erfunden.
 
 Online (GitHub Pages): https://drkby985ky-dotcom.github.io/Chemitzprojekt/
+
+## Plätzchenhaus-Blaupause (`plaetzchenhaus/`)
+
+| Datei | Inhalt |
+|---|---|
+| `plaetzchenhaus-blaupause.svg/.pdf` | Blaupause (blauer Hintergrund), A4 hoch, Schablonen 1:1 |
+| `plaetzchenhaus-druck.svg/.pdf` | Druckerfreundlich: weißer Hintergrund, blaue Linien |
+| `erzeuge_blaupause.py` | Erzeugt beide SVGs (`python3 erzeuge_blaupause.py`) |
+| `pdf_export.js` | SVG → PDF mit Chromium/Playwright (`node pdf_export.js`) |
+| `fonts/` | Courier Prime (SIL Open Font License), in die SVGs eingebettet |
+
+Drucken mit „Tatsächliche Größe / 100 %“, dann die 50-mm-Kontrolllinie nachmessen.
